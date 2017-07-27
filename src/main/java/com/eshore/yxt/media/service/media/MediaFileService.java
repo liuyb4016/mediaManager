@@ -48,19 +48,7 @@ public interface MediaFileService {
      * @CREAETDATE: 2017/7/27
      * @CREATETIME: 14:22
      */
-    public Result mediaFileUpload(CommonsMultipartFile impFile, String remark);
-
-    /**
-     * @DESCRIPTION: 增量保存白名单信息
-     * @FILENAME: com.eshore.yxt.media.service.media.MediaFileService
-     * @METHODNAME: saveMediaFile
-     * @PARAM whitelist
-     * ---------------------------------------
-     * @AUTHOR: liuyb
-     * @CREAETDATE: 2017/7/27
-     * @CREATETIME: 14:23
-     */
-    public Result saveMediaFile(MediaFile mediaFile);
+    public Result mediaFileUpload(CommonsMultipartFile mp4File,CommonsMultipartFile imgFile, String title,String mediaDesc);
 
     /**
      * @DESCRIPTION: 根据ID删除信息

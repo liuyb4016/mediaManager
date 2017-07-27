@@ -29,24 +29,25 @@ public class MediaFileController extends BaseController {
 	private MediaFileService whitelistService;
 	
 	/**
-	 * 
-	 * @Description:白名单管理页面
-	 * @param model
-	 * @return
-	 * @throws 
-	 * @author lbn
-	 * @date 2016年1月27日
+	 * @DESCRIPTION:
+	 *      管理页面
+	 * @FILENAME: com.eshore.yxt.media.web.mdeia.MediaFileController
+	 * @METHODNAME: initWhitelist
+	 * @PARAM model
+	 * ---------------------------------------
+	 * @AUTHOR: liuyb
+	 * @CREAETDATE: 2017/7/27
+	 * @CREATETIME: 15:21
 	 */
-	@RequestMapping("/listWhitelist")
+	@RequestMapping("/listMediaFile")
 	public String initWhitelist(Model model) {
-		return "whitelist/listWhitelist";
+		return "media/listMediaFile";
 	}
 	
-	@RequestMapping(value = "/listWhitelistByQuery")
+	@RequestMapping(value = "/listMediaFileByQuery")
 	@ResponseBody
 	public Grid listWhitelistByQuery(Pager pager, MediaFileReq req) {
 		//查询有效数据
-		req.setState(Constants.WHITE_LIST_STATE_1);
 		return whitelistService.findAllByPager(pager, req);
 	}
 	
