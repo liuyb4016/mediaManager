@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"  
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"  
+    xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"  
+    xmlns:jdbc="http://www.springframework.org/schema/jdbc" xmlns:mvc="http://www.springframework.org/schema/mvc"  
+    xmlns:util="http://www.springframework.org/schema/util"  
+    xsi:schemaLocation="http://www.springframework.org/schema/beans  
+                     http://www.springframework.org/schema/beans/spring-beans.xsd  
+                     http://www.springframework.org/schema/tx  
+                     http://www.springframework.org/schema/tx/spring-tx.xsd  
+                     http://www.springframework.org/schema/context   
+                     http://www.springframework.org/schema/context/spring-context.xsd  
+                     http://www.springframework.org/schema/aop  
+                     http://www.springframework.org/schema/aop/spring-aop.xsd  
+                     http://www.springframework.org/schema/jdbc  
+                     http://www.springframework.org/schema/jdbc/spring-jdbc-3.2.xsd  
+                     http://www.springframework.org/schema/util        
+                     http://www.springframework.org/schema/util/spring-util-3.2.xsd  
+                     http://www.springframework.org/schema/mvc   
+                     http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd">  
+  
+
+	<!-- 启动Spring Mvc注解扫描 -->
+	<mvc:annotation-driven>
+   		<mvc:message-converters register-defaults="true">
+          	 <!--  避免IE执行AJAX时,返回JSON出现下载文件 -->
+            <bean id="fastJsonHttpMessageConverter" class="com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter">
+                <property name="supportedMediaTypes">
+                    <list>
+                        <value>text/html;charset=UTF-8</value>
+                    </list>
+                </property>
+            </bean>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
+    
+    <mvc:interceptors>
+        <!-- 使用bean定义一个Interceptor，直接定义在mvc:interceptors根下面的Interceptor将拦截所有的请求 -->
+        <bean class="com.eshore.yxt.media.core.mvc.interceptors.SessionInterceptor"/>
+       <!--  
+       <mvc:interceptor>
+            <mvc:mapping path="/**"/>            
+         		  需排除拦截的地址  
+            <mvc:exclude-mapping path="/" />
+            <mvc:exclude-mapping path="/test" />
+          		 定义在mvc:interceptor下面的表示是对特定的请求才进行拦截的
+            <bean class="com.inteceptor.TimeInteceptor"/>
+        </mvc:interceptor> 
+        -->
+    </mvc:interceptors>
+    
+	<context:component-scan base-package="com.ccb.web" />
+
+	<!-- 映射静态资源 -->
+	<mvc:resources location="/jslib/" mapping="/jslib/**" />
+	<mvc:resources location="/style/" mapping="/style/**" />
+	<mvc:resources location="/images/" mapping="/images/**" />
+	<mvc:resources location="/js/" mapping="/js/**" />
+	<!-- <mvc:resources location="/upload/" mapping="/upload/**"/> <mvc:resources 
+		location="/upload2/" mapping="/upload2/**"/> -->
+	<mvc:resources location="/plug-in/" mapping="/plug-in/**" />
+
+	
+	
+	<!-- Json日期格式化 -->
+	<bean id="jsonDateSerializer" class="com.eshore.yxt.media.core.mvc.json.JsonDateSerializer"></bean>
+
+	<!-- 配置 文件上传的支持 -->
+	<bean id="multipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="maxUploadSize" value="1024000000" />
+		<property name="resolveLazily" value="true" />
+		<property name="maxInMemorySize" value="4096" />
+	</bean>
+
+
+
+	<bean
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="viewClass"
+			value="org.springframework.web.servlet.view.JstlView" />
+		<property name="prefix" value="/WEB-INF/page/" />
+		<property name="suffix" value=".jsp" />
+	</bean>
+
+	<!-- 开启Shiro注解的Spring配置方式的beans。在lifecycleBeanPostProcessor之后运行 -->
+	<bean
+		class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator"
+		depends-on="lifecycleBeanPostProcessor" />
+	<bean
+		class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">
+		<property name="securityManager" ref="securityManager" />
+	</bean>
+
+
+	<bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spring.LifecycleBeanPostProcessor" />
+
+	<!-- shiro为集成spring -->
+	<bean
+		class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+		<property name="exceptionMappings">
+			<props>
+				<prop key="org.apache.shiro.authz.UnauthorizedException">/commons/error</prop>
+			</props>
+		</property>
+	</bean>
+
+	<import resource="spring-mvc-shiro.xml" />
+
+</beans>

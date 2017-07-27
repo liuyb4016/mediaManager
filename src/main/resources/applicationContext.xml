@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+    xmlns:cache="http://www.springframework.org/schema/cache"
+    xsi:schemaLocation="
+                    http://www.springframework.org/schema/beans
+                    http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+                    http://www.springframework.org/schema/tx 
+                    http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+                    http://www.springframework.org/schema/aop 
+                    http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+                    http://www.springframework.org/schema/context      
+                    http://www.springframework.org/schema/context/spring-context-3.1.xsd
+                    http://www.springframework.org/schema/data/jpa
+           		    http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
+                    http://www.springframework.org/schema/cache 
+                    http://www.springframework.org/schema/cache/spring-cache-3.1.xsd">
+
+
+    <!-- 注解支持 -->
+    <context:annotation-config />
+    
+     <!-- 开启AOP监听 只对当前配置文件有效 -->
+    <aop:aspectj-autoproxy expose-proxy="true"/>
+
+    <!-- 启动组件扫描，排除@Controller组件，该组件由SpringMVC配置文件扫描 -->
+    <context:component-scan base-package="com.ccb.*">
+    	<context:exclude-filter type="regex" expression="com.ccb.core"/>   <!-- core包采用Xml配置 -->
+        <context:exclude-filter type="annotation"
+            expression="org.springframework.stereotype.Controller" />
+    </context:component-scan>
+
+    <!-- 属性文件位置 -->
+    <context:property-placeholder location="classpath:jdbc.properties" />
+
+    <!-- 数据源 -->
+    <bean id="dataSource" class="com.jolbox.bonecp.BoneCPDataSource"
+        destroy-method="close">
+        <!-- 数据库驱动 -->
+        <property name="driverClass" value="${jdbc.driverClassName}" />
+        <!-- 相应驱动的jdbcUrl-->
+        <property name="jdbcUrl" value="${jdbc.url}" />
+        <!-- 数据库的用户名 -->
+        <property name="username" value="${jdbc.username}" />
+        <!-- 数据库的密码 -->
+        <property name="password" value="${jdbc.password}" />
+        <!-- 检查数据库连接池中空闲连接的间隔时间，单位是分，默认值：240，如果要取消则设置为0 -->
+        <property name="idleConnectionTestPeriod"
+            value="${BoneCP.idleConnectionTestPeriod}" />
+        <!-- 连接池中未使用的链接最大存活时间，单位是分，默认值：60，如果要永远存活设置为0 -->
+        <property name="idleMaxAge" value="${BoneCP.idleMaxAge}" />
+
+    </bean>
+
+    <!-- JPA实体管理器工厂 -->
+    <bean id="entityManagerFactory"
+        class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+       <!--  <property name="persistenceUnitName" value="acme" /> 
+		<property name="persistenceProviderClass" value="org.hibernate.ejb.HibernatePersistence"></property>-->
+        <property name="dataSource" ref="dataSource" />
+        <property name="persistenceProvider" ref="persistenceProvider" />
+        <property name="jpaVendorAdapter" ref="jpaVendorAdapter" />
+        <property name="jpaDialect" ref="jpaDialect" />
+		<!-- 扫描实体类 -->
+        <property name="packagesToScan" value="com.ccb.model" />
+
+        <property name="jpaProperties">
+            <props>
+                <prop key="hibernate.dialect">
+                    org.hibernate.dialect.MySQLDialect
+                </prop>
+                <prop key="hibernate.connection.driver_class">
+                    com.mysql.jdbc.Driver
+                </prop>
+                <prop key="hibernate.max_fetch_depth">3</prop>
+                <prop key="hibernate.jdbc.fetch_size">18</prop>
+                <prop key="hibernate.jdbc.batch_size">10</prop>
+                <prop key="hibernate.hbm2ddl.auto">validate</prop>    <!-- hibernate生成数据库表的配置 -->
+                <prop key="hibernate.show_sql">false</prop>
+                <prop key="hibernate.format_sql">false</prop>
+                <prop key="javax.persistence.validation.mode">
+                    none
+                </prop>
+                <!-- <prop
+                    key="hibernate.search.default.directory_provider">
+                    filesystem
+                </prop> -->
+                <!--设置为手动添加索引 <prop key="hibernate.search.indexing_strategy">manual</prop> -->
+              <!--   <prop key="hibernate.search.default.indexBase">
+                    d:/indexs
+                </prop> -->
+            </props>
+        </property>
+    </bean>
+    
+    <!-- 用于指定持久化实现厂商类 -->
+    <bean id="persistenceProvider"
+        class="org.hibernate.ejb.HibernatePersistence" />
+    <!-- 用于设置JPA实现厂商的特定属性 -->
+    <bean id="jpaVendorAdapter"
+        class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+        <property name="database" value="MYSQL" />
+    </bean>
+    <!-- 用于指定一些高级特性 -->
+    <bean id="jpaDialect"
+        class="org.springframework.orm.jpa.vendor.HibernateJpaDialect" />
+	
+	<!-- 扫描 repositories -->
+	<jpa:repositories base-package="com.ccb.repository"
+		entity-manager-factory-ref="entityManagerFactory"
+		transaction-manager-ref="transactionManager" />
+		
+		   
+    <!--事务管理器配置-->
+    <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+         <property name="entityManagerFactory"
+            ref="entityManagerFactory" />
+    </bean>
+
+    <tx:advice id="txAdvice" transaction-manager="transactionManager">
+        <tx:attributes>
+            <tx:method name="*" propagation="REQUIRED"/>
+        </tx:attributes>
+    </tx:advice>
+
+    <aop:config expose-proxy="true" proxy-target-class="true">
+        <!-- 只对业务逻辑层实施事务 -->
+        <aop:pointcut id="txPointcut" expression="execution(* com.ccb.service..*+.*(..))"/>
+        <aop:advisor id="txAdvisor" advice-ref="txAdvice" pointcut-ref="txPointcut"/>
+    </aop:config>
+    
+    
+    <bean class="com.eshore.yxt.media.core.util.SpringUtils"/>
+   
+    <import resource="classpath:spring-config-cache.xml"/>
+    <import resource="classpath:spring-config-shiro.xml"/>
+
+</beans>
