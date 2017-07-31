@@ -38,7 +38,7 @@ public class MediaFile extends AutoModel implements Serializable {
 	private String fileName;//文件名
 	 
 	@Column(name = "size")
-	private Integer size;//文件大小   bit
+	private Long size;//文件大小   bit
 	
 	@Column(name = "show_pic")
 	private String showPic;// 图片  源文件有数据
@@ -51,6 +51,9 @@ public class MediaFile extends AutoModel implements Serializable {
 
     @Column(name = "source_id")
     private Long sourceId;//源文件id 0本身
+
+    @Column(name = "status")
+    private Integer status;//状态  0已处理 1未处理    2 正在处理 3 处理出错
 
 	@JsonSerialize(using=JsonDateSerializer.class) 
 	@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") 
@@ -86,11 +89,11 @@ public class MediaFile extends AutoModel implements Serializable {
         this.fileName = fileName;
     }
 
-    public Integer getSize() {
+    public Long getSize() {
         return size;
     }
 
-    public void setSize(Integer size) {
+    public void setSize(Long size) {
         this.size = size;
     }
 

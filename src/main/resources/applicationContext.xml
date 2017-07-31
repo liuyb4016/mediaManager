@@ -29,14 +29,14 @@
     <aop:aspectj-autoproxy expose-proxy="true"/>
 
     <!-- 启动组件扫描，排除@Controller组件，该组件由SpringMVC配置文件扫描 -->
-    <context:component-scan base-package="com.ccb.*">
-    	<context:exclude-filter type="regex" expression="com.ccb.core"/>   <!-- core包采用Xml配置 -->
+    <context:component-scan base-package="com.eshore.yxt.media.*">
+    	<context:exclude-filter type="regex" expression="com.eshore.yxt.media.core"/>   <!-- core包采用Xml配置 -->
         <context:exclude-filter type="annotation"
             expression="org.springframework.stereotype.Controller" />
     </context:component-scan>
 
     <!-- 属性文件位置 -->
-    <context:property-placeholder location="classpath:jdbc.properties" />
+    <context:property-placeholder location="classpath:dev/jdbc.properties" />
 
     <!-- 数据源 -->
     <bean id="dataSource" class="com.jolbox.bonecp.BoneCPDataSource"
@@ -50,8 +50,7 @@
         <!-- 数据库的密码 -->
         <property name="password" value="${jdbc.password}" />
         <!-- 检查数据库连接池中空闲连接的间隔时间，单位是分，默认值：240，如果要取消则设置为0 -->
-        <property name="idleConnectionTestPeriod"
-            value="${BoneCP.idleConnectionTestPeriod}" />
+        <property name="idleConnectionTestPeriod" value="${BoneCP.idleConnectionTestPeriod}" />
         <!-- 连接池中未使用的链接最大存活时间，单位是分，默认值：60，如果要永远存活设置为0 -->
         <property name="idleMaxAge" value="${BoneCP.idleMaxAge}" />
 
@@ -67,7 +66,7 @@
         <property name="jpaVendorAdapter" ref="jpaVendorAdapter" />
         <property name="jpaDialect" ref="jpaDialect" />
 		<!-- 扫描实体类 -->
-        <property name="packagesToScan" value="com.ccb.model" />
+        <property name="packagesToScan" value="com.eshore.yxt.media.model" />
 
         <property name="jpaProperties">
             <props>
@@ -111,7 +110,7 @@
         class="org.springframework.orm.jpa.vendor.HibernateJpaDialect" />
 	
 	<!-- 扫描 repositories -->
-	<jpa:repositories base-package="com.ccb.repository"
+	<jpa:repositories base-package="com.eshore.yxt.media.repository"
 		entity-manager-factory-ref="entityManagerFactory"
 		transaction-manager-ref="transactionManager" />
 		
@@ -130,7 +129,7 @@
 
     <aop:config expose-proxy="true" proxy-target-class="true">
         <!-- 只对业务逻辑层实施事务 -->
-        <aop:pointcut id="txPointcut" expression="execution(* com.ccb.service..*+.*(..))"/>
+        <aop:pointcut id="txPointcut" expression="execution(* com.eshore.yxt.media.service..*+.*(..))"/>
         <aop:advisor id="txAdvisor" advice-ref="txAdvice" pointcut-ref="txPointcut"/>
     </aop:config>
     

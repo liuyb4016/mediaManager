@@ -4,7 +4,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>建行微信管理平台</title>
+<title>视频文件管理平台</title>
 <link rel="shortcut icon" href="${ctx}/style/images/index/favicon.png" />
 <!--[if lt IE 9]>
    <script src="plug-in/login/js/html5.js"></script>

@@ -49,15 +49,11 @@
         -->
     </mvc:interceptors>
     
-	<context:component-scan base-package="com.ccb.web" />
+	<context:component-scan base-package="com.eshore.yxt.media.web" />
 
 	<!-- 映射静态资源 -->
 	<mvc:resources location="/jslib/" mapping="/jslib/**" />
 	<mvc:resources location="/style/" mapping="/style/**" />
-	<mvc:resources location="/images/" mapping="/images/**" />
-	<mvc:resources location="/js/" mapping="/js/**" />
-	<!-- <mvc:resources location="/upload/" mapping="/upload/**"/> <mvc:resources 
-		location="/upload2/" mapping="/upload2/**"/> -->
 	<mvc:resources location="/plug-in/" mapping="/plug-in/**" />
 
 	

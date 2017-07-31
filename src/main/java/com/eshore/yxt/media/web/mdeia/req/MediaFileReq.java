@@ -3,9 +3,18 @@ package com.eshore.yxt.media.web.mdeia.req;
 public class MediaFileReq {
 
     private Long id;//id
+    private Long notId;//判断使用
     private String title;//名称
     private Long sourceId;//源文件id 0本身
     private Integer type;//文件类型 0源文件   1标清  2高清
+
+    public Long getNotId() {
+        return notId;
+    }
+
+    public void setNotId(Long notId) {
+        this.notId = notId;
+    }
 
     public Integer getType() {
         return type;

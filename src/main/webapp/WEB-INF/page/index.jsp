@@ -7,7 +7,7 @@
 <head>
 <jsp:include page="inc.jsp"></jsp:include>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>建行微信管理平台</title>
+<title>视频文件管理平台</title>
 <script type="text/javascript">
 /* 	function show(){
 	    $.messager.show({

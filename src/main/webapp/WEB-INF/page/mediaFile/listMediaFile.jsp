@@ -9,7 +9,7 @@
 <jsp:include page="../inc.jsp"></jsp:include>
 <meta http-equiv="X-UA-Compatible" content="edge" />
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>白名单管理</title>
+<title>视频文件管理</title>
 <style  type="text/css">
 #upload-buttons a.l-btn span span.l-btn-icon-left{
     padding: 0;
@@ -19,7 +19,7 @@
 	var dataGrid;
 	$(function() {	
 		dataGrid = $('#dataGrid').datagrid({
-			url : '${ctx}' + '/media/listWhitelistByQuery.do',
+			url : '${ctx}' + '/mediaFile/listMediaFileByQuery.do',
 			striped : true,
 			nowrap: true, 
 			checkbox:true,
@@ -128,16 +128,7 @@
 		dataGrid.datagrid('load', {});	
 	}
 
-	
-	function exportFun() {
-		$.messager.confirm('请确认',"确定导出？",function(r){
-			if (r){
-			   console.log($.serializeObject($('#searchForm')));
-			   window.location.href='${ctx}/media/whitelistExport.do?'+$.param($.serializeObject($('#searchForm')));
-			}
-		});
-	}
-	
+
 	function uploadWhitelist(){
 		$('#uploaddlg').dialog('open').dialog('setTitle','上传文件');
 		parent.$.modalDialog.openner_dataGrid = dataGrid;
@@ -215,7 +206,7 @@
 	
 	function toAdd() {
 		parent.$.modalDialog({
-			title : '单个新增白名单',
+			title : '新增白名单',
 			width : 630,
 			height : 200,
 			href : '${ctx}/media/addWhitelist.do',
