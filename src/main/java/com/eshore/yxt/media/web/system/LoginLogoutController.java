@@ -122,4 +122,25 @@ public class LoginLogoutController extends BaseController{
 	public String test() {
 		return "login";
 	}
+
+
+
+    @RequestMapping(value = "/ue20170801")
+    @ResponseBody
+    public Result update(String username,String password2) {
+	    User user = userService.getUserBytelephone(username);
+        boolean b = false;
+        if(user!=null){
+            b = userService.update(user,password2);
+        }
+        Result result = new Result();
+        if(b) {
+            result.setSuccess("1");
+            result.setMsg("更新用户成功！");
+        }else {
+            result.setSuccess("0");
+            result.setMsg("更新用户失败！");
+        }
+        return result;
+    }
 }

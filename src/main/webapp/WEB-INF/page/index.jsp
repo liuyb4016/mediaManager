@@ -213,13 +213,13 @@
 						<h2>系统介绍</h2>
 						<div class="light-info">
 							<div class="light-tip icon-tip"></div>
-							<div>欢迎您使用建行商城管理平台</div>
+							<div>欢迎您使用流媒体管理平台</div>
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
-		<div data-options="region:'south',border:false" style="height: 30px;line-height: 30px; overflow: hidden;text-align: center;background-color: #daeef5" >建行商城管理平台</div>
+		<div data-options="region:'south',border:false" style="height: 30px;line-height: 30px; overflow: hidden;text-align: center;background-color: #daeef5" >流媒体管理平台</div>
 	</div>
 	
 	<!--[if lte IE 7]>

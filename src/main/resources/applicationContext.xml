@@ -36,7 +36,7 @@
     </context:component-scan>
 
     <!-- 属性文件位置 -->
-    <context:property-placeholder location="classpath:dev/jdbc.properties" />
+    <context:property-placeholder location="classpath:jdbc.properties" />
 
     <!-- 数据源 -->
     <bean id="dataSource" class="com.jolbox.bonecp.BoneCPDataSource"

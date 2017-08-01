@@ -12,13 +12,13 @@ public class PropertiesUtils {
 	}
 	private synchronized static void loadProperties() {
 		if (properties == null) {
-			properties = new InitPropLoader().getProperties("config.properties");	
+			properties = new InitPropLoader().getProperties("config.properties");
 		}
     }
 	
 	public synchronized static void reloadProperties() {
 		properties = null;
-		properties = new InitPropLoader().getProperties("config.properties");	
+		properties = new InitPropLoader().getProperties("config.properties");
     }
 	
 	public static String getProperty(String property){

@@ -40,7 +40,7 @@ public class MediaFileController extends BaseController {
 	 */
 	@RequestMapping("/listMediaFile")
 	public String listMediaFile(Model model) {
-		return "media/listMediaFile";
+		return "mediaFile/listMediaFile";
 	}
 	
 	@RequestMapping(value = "/listMediaFileByQuery")

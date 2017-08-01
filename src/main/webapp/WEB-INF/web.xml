@@ -36,7 +36,7 @@
   </filter-mapping>
   <context-param>
     <param-name>webAppRootKey</param-name>
-    <param-value>spring_springmvc_jpa.ccbManager</param-value>
+    <param-value>spring_springmvc_jpa.mediaManager</param-value>
   </context-param>
   <context-param>
     <param-name>log4jConfigLocation</param-name>
