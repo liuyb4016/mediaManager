@@ -4,19 +4,21 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
+import com.eshore.yxt.media.core.util.barcode.QRBarCodeWriter;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
-import org.apache.log4j.Logger;
 
 import cn.eshore.common.util.MobileGlobals;
 import cn.eshore.common.util.Util;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class FtpUtil {
-	protected  final static  Logger log = Logger.getLogger(FtpUtil.class);
+    public static final Logger log = LoggerFactory.getLogger(FtpUtil.class);
 	private static String ftpServer1=Util.nullToStr(MobileGlobals.getProperty("yxt.ftp.upload.sever1"));
 	private static String ftpServer2=Util.nullToStr(MobileGlobals.getProperty("yxt.ftp.upload.sever2"));
 	private static int ftpPort=Integer.parseInt(MobileGlobals.getProperty("yxt.ftp.upload.port"));

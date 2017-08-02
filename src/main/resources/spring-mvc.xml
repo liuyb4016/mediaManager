@@ -101,6 +101,10 @@
 		</property>
 	</bean>
 
-	<import resource="spring-mvc-shiro.xml" />
+    <!-- Shiro：基于Controller方法级别的权限验证注解配置  -->
+    <aop:config proxy-target-class="true"></aop:config>
+    <bean class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">
+        <property name="securityManager" ref="securityManager"/>
+    </bean>
 
 </beans>

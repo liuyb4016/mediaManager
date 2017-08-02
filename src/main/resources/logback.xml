@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<!-- encoder 默认配置为PatternLayoutEncoder -->
+		<encoder>
+			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread][%M : %L] %-5level %logger{36} - %msg%n
+			</pattern>
+		</encoder>
+	</appender>
+	
+	<appender name="FILE"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>/home/pww/target/logs/mediaManager.%d{yyyy-MM-dd}.log</fileNamePattern>
+			<maxHistory>30</maxHistory>
+		</rollingPolicy>
+
+		<encoder>
+			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread][%M : %L] %-5level %logger{36} - %msg%n
+			</pattern>
+			<charset>UTF-8</charset>
+		</encoder>
+	</appender>
+	<logger name="com.eshore.yxt.media" level="DEBUG"  additivity="false">
+	    <appender-ref ref="FILE" />
+	    <appender-ref ref="STDOUT" />
+	</logger>	
+	<logger name="net.gz2000.sms" level="INFO" additivity="false">
+	    <appender-ref ref="FILE" />
+	</logger>
+	<logger name="com.ruanwei" level="INFO"  additivity="false">
+	    <appender-ref ref="FILE" />
+	</logger>
+    <logger name="com.jagregory.shiro" level="INFO" />
+	<logger name="com.alibaba.druid" level="INFO" />
+	<logger name="net.rubyeye.xmemcached" level="INFO" />
+	<logger name="com.google.code.yanf4j" level="INFO" />
+	<logger name="cn.meteor" level="INFO" />
+	<logger name="freemarker" level="INFO" />
+	<logger name="org.mybatis" level="WARN" />
+	<logger name="org.apache" level="WARN" />
+	<logger name="org.springframework.jdbc" level="INFO" />
+    <logger name="org.hibernate" level="INFO" />
+	<logger name="org.springframework" level="WARN" />
+	<logger name="org.mongodb" level="WARN" />
+	
+	<!-- 本地开发环境屏蔽警告 -->
+	<logger name="org.springframework.jms.listener" level="ERROR" />	
+	<logger name="net.sf.ehcache" level="INFO" />
+
+
+	<root level="DEBUG">
+		<appender-ref ref="STDOUT" />
+		<appender-ref ref="FILE" />
+	</root>
+</configuration>

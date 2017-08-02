@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean name="memcachedClientForSystem"
+          class="net.rubyeye.xmemcached.utils.XMemcachedClientFactoryBean" destroy-method="shutdown">
+        <property name="servers">
+            <value>${xmemcached.system.servers}</value>
+        </property>
+        <property name="weights">
+            <list>
+                <value>${xmemcached.system.server1.weight}</value>
+                <value>${xmemcached.system.server2.weight}</value>
+            </list>
+        </property>
+        <property name="connectionPoolSize">
+            <value>${xmemcached.system.connectionPoolSize}</value>
+        </property>
+        <property name="failureMode">
+            <value>${xmemcached.system.failureMode}</value>
+        </property>
+    </bean>
+
+
+</beans>

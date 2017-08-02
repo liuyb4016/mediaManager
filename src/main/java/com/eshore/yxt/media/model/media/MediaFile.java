@@ -28,6 +28,9 @@ public class MediaFile extends AutoModel implements Serializable {
 
     private static final long serialVersionUID = -7717809130965680007L;
 
+    @Column(name = "file_id")
+    private String fileId;//文件ID
+
     @Column(name = "title")
     private String title;//名称
 
@@ -39,9 +42,6 @@ public class MediaFile extends AutoModel implements Serializable {
 	 
 	@Column(name = "size")
 	private Long size;//文件大小   bit
-	
-	@Column(name = "show_pic")
-	private String showPic;// 图片  源文件有数据
 
     @Column(name = "md5")
     private String md5;//md5值
@@ -52,9 +52,6 @@ public class MediaFile extends AutoModel implements Serializable {
     @Column(name = "source_id")
     private Long sourceId;//源文件id 0本身
 
-    @Column(name = "status")
-    private Integer status;//状态  0已处理 1未处理    2 正在处理 3 处理出错
-
 	@JsonSerialize(using=JsonDateSerializer.class) 
 	@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") 
 	@Column(name = "create_time")
@@ -64,6 +61,15 @@ public class MediaFile extends AutoModel implements Serializable {
 	@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") 
 	@Column(name = "update_time")
 	private Date updateTime;
+
+
+    public String getFileId() {
+        return fileId;
+    }
+
+    public void setFileId(String fileId) {
+        this.fileId = fileId;
+    }
 
     public String getTitle() {
         return title;
@@ -95,14 +101,6 @@ public class MediaFile extends AutoModel implements Serializable {
 
     public void setSize(Long size) {
         this.size = size;
-    }
-
-    public String getShowPic() {
-        return showPic;
-    }
-
-    public void setShowPic(String showPic) {
-        this.showPic = showPic;
     }
 
     public String getMd5() {

@@ -199,7 +199,7 @@ public class MediaFileSerivceImpl implements MediaFileService {
                     return result;
                 }
                 String imgFilePath = this.uploadFile(imgFile);
-                mediaFile.setShowPic(imgFilePath);
+                //mediaFile.setShowPic(imgFilePath);
                 mediaFile.setCreateTime(new Date());
                 mediaFile.setUpdateTime(new Date());
                 mediaFile.setSourceId(0L);
@@ -228,9 +228,9 @@ public class MediaFileSerivceImpl implements MediaFileService {
                 //删除源文件、处理后的标清、高清视频资源
                 new File(mediaFile.getFileName()).deleteOnExit();
                 //删除图片
-                if("0".equals(mediaFile.getShowPic())){
+                /*if("0".equals(mediaFile.getShowPic())){
                     new File(mediaFile.getShowPic()).deleteOnExit();
-                }
+                }*/
                 //删除数据库信息
                 mediaFileRepository.delete(mediaFile);
             }

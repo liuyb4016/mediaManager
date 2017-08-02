@@ -10,8 +10,8 @@ import java.io.UnsupportedEncodingException;
 
 import javax.imageio.ImageIO;
 
-import org.apache.log4j.Logger;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import sun.misc.BASE64Decoder;
 
 import com.swetake.util.Qrcode;
@@ -24,10 +24,9 @@ import com.swetake.util.Qrcode;
  ***/
 public class QRBarCodeWriter {
 
-	
+    public static final Logger logger = LoggerFactory.getLogger(QRBarCodeWriter.class);
 	//QR二维码实例对象
 	private static QRBarCodeWriter qrBarCodeWriter = null;
-	private Logger logger = Logger.getLogger(QRBarCodeWriter.class);
 	
 	private QRBarCodeWriter(){
 		
