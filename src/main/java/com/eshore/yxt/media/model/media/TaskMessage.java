@@ -52,11 +52,8 @@ public class TaskMessage extends AutoModel implements Serializable {
     @Column(name = "video_urls")
     private String videoUrls;//视频下载地址 支持ftp://   http://  下载
 
-    @Column(name = "download_status")
-    private Integer downloadStatus;//源文件下载状态  0未下载 1已下载    2 正在下载 -1 处理出错
-
-    @Column(name = "dule_status")
-    private Integer duleStatus;//处理状态  0未处理 1已处理    2 正在处理 -1 处理出错
+    @Column(name = "status")
+    private Integer status;//处理状态  0未处理 1 正在下载  2 已下载   3 正在转码处理 4 转码已处理     5 正在回调通知给第三方 6 已完成处理 -1 下载处理出错 -2 转码处理出错
 
     @Column(name = "dule_message")
     private String duleMessage;//处理结果描述
@@ -143,20 +140,12 @@ public class TaskMessage extends AutoModel implements Serializable {
         this.videoUrls = videoUrls;
     }
 
-    public Integer getDownloadStatus() {
-        return downloadStatus;
+    public Integer getStatus() {
+        return status;
     }
 
-    public void setDownloadStatus(Integer downloadStatus) {
-        this.downloadStatus = downloadStatus;
-    }
-
-    public Integer getDuleStatus() {
-        return duleStatus;
-    }
-
-    public void setDuleStatus(Integer duleStatus) {
-        this.duleStatus = duleStatus;
+    public void setStatus(Integer status) {
+        this.status = status;
     }
 
     public String getDuleMessage() {
