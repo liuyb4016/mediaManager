@@ -1,5 +1,6 @@
 package com.eshore.yxt.media.web.mdeia;
 
+import com.eshore.yxt.media.core.constants.Constants;
 import com.eshore.yxt.media.core.util.cache.MediaCache;
 import com.eshore.yxt.media.core.util.cache.MemcacheCaller;
 import com.eshore.yxt.media.model.media.TaskMessage;
@@ -56,14 +57,14 @@ public class MediaTaskSyncController extends BaseController {
             return taskMessageResq;
         }
 
-        Boolean isIn =  MemcacheCaller.INSTANCE.add(MediaCache.CREATE_TASK_KEY+"_"+type+"_"+fileId, 2, "2");
+        Boolean isIn =  MemcacheCaller.INSTANCE.add(Constants.CREATE_TASK_KEY+"_"+type+"_"+fileId, 2, "2");
         try{
             if(isIn){
                 TaskMessage taskMessage = taskMessageService.getTaskMessageByFileId(type,fileId);
                 if(taskMessage!=null){
                     taskMessageResq.setStatus("-10002");
                     taskMessageResq.setErrorMsg("创建任务的文件已存在,无法再创建新的任务了");
-                    MemcacheCaller.INSTANCE.delete(MediaCache.CREATE_TASK_KEY+"_"+type+"_"+fileId);
+                    MemcacheCaller.INSTANCE.delete(Constants.CREATE_TASK_KEY+"_"+type+"_"+fileId);
                     return  taskMessageResq;
                 }
 
@@ -71,8 +72,7 @@ public class MediaTaskSyncController extends BaseController {
                 taskMessage.setTaskId(DateFormatUtils.format(new Date(),"yyyyMMddHH")+"_"+ UUID.randomUUID().toString());
                 taskMessage.setFileId(task.getFileId());
                 taskMessage.setCallbackUrl(task.getCallbackUrl());
-                taskMessage.setDownloadStatus(0);
-                taskMessage.setDuleStatus(0);
+                taskMessage.setStatus(Constants.TaskMessageStatus.NO_DULE);
                 taskMessage.setCreateTime(new Date());
                 taskMessage.setType(type);
                 taskMessage.setFileId(fileId);
@@ -80,22 +80,23 @@ public class MediaTaskSyncController extends BaseController {
                 taskMessage.setVideoMd5(task.getVideoMd5());
                 taskMessage.setVideoName(task.getVideoName());
                 taskMessage.setVideoSize(task.getVideoSize());
+                taskMessage.setUrlType(task.getUrlType());
                 taskMessage.setVideoUrls(task.getVideoUrl());
                 taskMessageService.addOrUpdate(taskMessage);
-                MemcacheCaller.INSTANCE.delete(MediaCache.CREATE_TASK_KEY+"_"+type+"_"+fileId);
+                MemcacheCaller.INSTANCE.delete(Constants.CREATE_TASK_KEY+"_"+type+"_"+fileId);
             }else{
                 taskMessageResq.setStatus("-10003");
                 taskMessageResq.setErrorMsg("操作重复，已发送创建任务的操作");
-                MemcacheCaller.INSTANCE.delete(MediaCache.CREATE_TASK_KEY+"_"+type+"_"+fileId);
+                MemcacheCaller.INSTANCE.delete(Constants.CREATE_TASK_KEY+"_"+type+"_"+fileId);
                 return  taskMessageResq;
             }
         }catch(Exception e){
             e.printStackTrace();
-            MemcacheCaller.INSTANCE.delete(MediaCache.CREATE_TASK_KEY+"_"+type+"_"+fileId);
+            MemcacheCaller.INSTANCE.delete(Constants.CREATE_TASK_KEY+"_"+type+"_"+fileId);
             taskMessageResq.setStatus("-10004");
             taskMessageResq.setErrorMsg("系统错误");
         }finally {
-            MemcacheCaller.INSTANCE.delete(MediaCache.CREATE_TASK_KEY+"_"+type+"_"+fileId);
+            MemcacheCaller.INSTANCE.delete(Constants.CREATE_TASK_KEY+"_"+type+"_"+fileId);
         }
         return taskMessageResq;
 	}

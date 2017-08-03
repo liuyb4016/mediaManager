@@ -19,9 +19,18 @@ public class TaskMessageReq implements Serializable {
 
     private String videoMd5;//视频md5
 
-    private String videoUrl;//视频下载地址 支持ftp://   http://  下载
+    private Integer urlType;//视频下载地址  1 :ftp 相对路径   2: http://
+    private String videoUrl;//视频下载路径
 
     private String callbackUrl;//处理结果回调  提供一个接收结果的接口
+
+    public Integer getUrlType() {
+        return urlType;
+    }
+
+    public void setUrlType(Integer urlType) {
+        this.urlType = urlType;
+    }
 
     public String getType() {
         return type;

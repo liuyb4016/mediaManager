@@ -68,4 +68,7 @@ public interface MediaFileService {
     public Long countMediaFileByTitle(MediaFileReq mediaFileReq);
 
     public List<MediaFile> findMediaFileByidsourceId(Long id);
+
+
+    public MediaFile addOrUpdate(MediaFile mediaFile);
 }

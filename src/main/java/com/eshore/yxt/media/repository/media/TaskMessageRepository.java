@@ -3,13 +3,27 @@ package com.eshore.yxt.media.repository.media;
 import com.eshore.yxt.media.model.media.MediaFile;
 import com.eshore.yxt.media.model.media.TaskMessage;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+
+import java.util.Collection;
+import java.util.List;
 
 
 public interface TaskMessageRepository extends CrudRepository<TaskMessage, Long>,JpaSpecificationExecutor<TaskMessage> {
 
     @Query("from TaskMessage taskMessage where taskMessage.type = ?1 and taskMessage.fileId=?2 ")
     public TaskMessage getTaskMessageByFileId(String type,String fileId);
+
+    @Query("from TaskMessage taskMessage where taskMessage.status=?1 ")
+    public List<TaskMessage> findListTaskMessageByStatus(Integer status);
+
+    @Query("SELECT taskMessage.id from TaskMessage taskMessage where taskMessage.status=?1 ")
+    public List<Long> findIdListTaskMessageByStatus(Integer status);
+
+    /*@Modifying
+    @Query("update TaskMessage u set u.status = ?1 where u.id=?2")
+    public int updateStatus(Integer status,Long id);*/
 }
 

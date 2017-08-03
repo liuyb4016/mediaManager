@@ -47,7 +47,10 @@ public class MediaFile extends AutoModel implements Serializable {
     private String md5;//md5值
 
     @Column(name = "type")
-    private Integer type;//文件类型 0源文件   1标清  2高清
+    private Integer type;//数据id  1 院线通片花
+
+    @Column(name = "def_type")
+    private Integer defType;//文件类型 0源文件   1标清  2高清
 
     @Column(name = "source_id")
     private Long sourceId;//源文件id 0本身
@@ -62,6 +65,13 @@ public class MediaFile extends AutoModel implements Serializable {
 	@Column(name = "update_time")
 	private Date updateTime;
 
+    public Integer getDefType() {
+        return defType;
+    }
+
+    public void setDefType(Integer defType) {
+        this.defType = defType;
+    }
 
     public String getFileId() {
         return fileId;

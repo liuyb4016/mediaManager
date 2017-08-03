@@ -23,6 +23,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -98,6 +99,12 @@ public class MediaFileSerivceImpl implements MediaFileService {
         return list;
     }
 
+    @Modifying
+    @Override
+    public MediaFile addOrUpdate(MediaFile mediaFile) {
+        return mediaFileRepository.save(mediaFile);
+    }
+
     /**
      * @param mediaFileReq 查询条件
      * @return
@@ -143,7 +150,7 @@ public class MediaFileSerivceImpl implements MediaFileService {
             }
         };
     }
-
+    @Modifying
     @Override
     public Result mediaFileUpload(CommonsMultipartFile mp4File,CommonsMultipartFile imgFile, String title,String mediaDesc,Long id) {
         logger.info("MediaFileSerivceImpl mediaFileUpload start:");
@@ -218,7 +225,7 @@ public class MediaFileSerivceImpl implements MediaFileService {
             return result;
         }
     }
-
+    @Modifying
     @Override
     public boolean deleteById(long id) {
         List<MediaFile> list = this.findMediaFileByidsourceId(id);

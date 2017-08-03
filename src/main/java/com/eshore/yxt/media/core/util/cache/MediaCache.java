@@ -19,7 +19,6 @@ public enum MediaCache {
 	private final static int EXPIRE_AP_TOKENID_MAPPING_RESPKEY = 60*60;	//一小时
 	public static final String EXCEPTION_RESULT = "Exception!!!";
 	private final static String MAPSTART = "__MAP__";
-    public static final String CREATE_TASK_KEY = "CREATE_TASK_KEY";
 
 	private static Logger logger = LoggerFactory.getLogger(MediaCache.class);
 	

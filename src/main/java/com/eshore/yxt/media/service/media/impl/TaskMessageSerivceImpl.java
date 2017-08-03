@@ -57,4 +57,13 @@ public class TaskMessageSerivceImpl implements TaskMessageService {
         return taskMessageRepository.save(taskMessage);
     }
 
+    @Override
+    public List<Long> findIdListTaskMessageByStatus(Integer status) {
+        return taskMessageRepository.findIdListTaskMessageByStatus(status);
+    }
+
+    @Override
+    public TaskMessage getByid(Long id){
+        return taskMessageRepository.findOne(id);
+    }
 }

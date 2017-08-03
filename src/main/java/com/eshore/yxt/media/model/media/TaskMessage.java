@@ -32,7 +32,7 @@ public class TaskMessage extends AutoModel implements Serializable {
     private String taskId;//任务ID   对应多个文件id列表
 
     @Column(name = "type")
-    private String type;//数据id  1 院线通片花
+    private Integer type;//数据id  1 院线通片花
 
     @Column(name = "file_id")
     private String fileId;//文件ID
@@ -48,6 +48,9 @@ public class TaskMessage extends AutoModel implements Serializable {
 
     @Column(name = "video_md5")
     private String videoMd5;//视频md5
+
+    @Column(name = "url_type")
+    private Integer urlType;//视频下载地址类型  1：ftp://  2：http://
 
     @Column(name = "video_urls")
     private String videoUrls;//视频下载地址 支持ftp://   http://  下载
@@ -76,6 +79,14 @@ public class TaskMessage extends AutoModel implements Serializable {
     @Column(name = "dule_update_time")
     private Date duleUpdateTime;//转码更新时间
 
+    public Integer getUrlType() {
+        return urlType;
+    }
+
+    public void setUrlType(Integer urlType) {
+        this.urlType = urlType;
+    }
+
     public String getTaskId() {
         return taskId;
     }
@@ -84,11 +95,11 @@ public class TaskMessage extends AutoModel implements Serializable {
         this.taskId = taskId;
     }
 
-    public String getType() {
+    public Integer getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(Integer type) {
         this.type = type;
     }
 
