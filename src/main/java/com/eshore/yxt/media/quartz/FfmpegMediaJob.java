@@ -73,7 +73,7 @@ public class FfmpegMediaJob {
                 taskMessageService.addOrUpdate(taskMessage);
 
             }catch (Exception e){
-                e.printStackTrace();
+                logger.error("FfmpegMediaJob error-->,{}",e);
                 taskMessage.setStatus(Constants.TaskMessageStatus.FFMPEGED);
                 taskMessage.setDuleMessage(e.getMessage());
                 taskMessageService.addOrUpdate(taskMessage);

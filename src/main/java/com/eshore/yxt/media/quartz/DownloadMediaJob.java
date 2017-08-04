@@ -97,7 +97,7 @@ public class DownloadMediaJob {
                         throw new Exception("文件下载失败，文件已下载，但文件内容长度或md5 与接口获取的值不一致。taskId"+taskMessage.getTaskId());
                     }
                 }catch(Exception e){
-                    e.printStackTrace();
+                    logger.error("DownloadMediaJob error-->,{}",e);
                     if(filePath!=null){
                         File downfile = new File(filePath);
                         if(downfile.exists()){
