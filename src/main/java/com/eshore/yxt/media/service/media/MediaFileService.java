@@ -71,4 +71,7 @@ public interface MediaFileService {
 
 
     public MediaFile addOrUpdate(MediaFile mediaFile);
+
+
+    public MediaFile getMediaFileBTaskId(String taskId);
 }

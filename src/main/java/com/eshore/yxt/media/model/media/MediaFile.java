@@ -31,6 +31,9 @@ public class MediaFile extends AutoModel implements Serializable {
     @Column(name = "file_id")
     private String fileId;//文件ID
 
+    @Column(name = "task_id")
+    private String taskId;//任务ID
+
     @Column(name = "title")
     private String title;//名称
 

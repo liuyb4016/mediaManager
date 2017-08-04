@@ -105,6 +105,11 @@ public class MediaFileSerivceImpl implements MediaFileService {
         return mediaFileRepository.save(mediaFile);
     }
 
+    @Override
+    public MediaFile getMediaFileBTaskId(String taskId) {
+        return mediaFileRepository.getMediaFileBTaskId(taskId);
+    }
+
     /**
      * @param mediaFileReq 查询条件
      * @return
