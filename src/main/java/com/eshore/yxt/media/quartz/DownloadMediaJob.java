@@ -3,6 +3,7 @@ package com.eshore.yxt.media.quartz;
 import com.eshore.yxt.media.core.constants.Constants;
 import com.eshore.yxt.media.core.util.FtpDownloadUtil;
 import com.eshore.yxt.media.core.util.HttpDownloadUtil;
+import com.eshore.yxt.media.core.util.cache.MediaCache;
 import com.eshore.yxt.media.core.util.cache.MemcacheCaller;
 import com.eshore.yxt.media.core.util.media.FileDigest;
 import com.eshore.yxt.media.model.media.MediaFile;
@@ -22,11 +23,13 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
 public class DownloadMediaJob {
 
     public static final Logger logger = LoggerFactory.getLogger(DownloadMediaJob.class);
+    private static AtomicInteger count = new AtomicInteger(0);//线程安全的计数变量
 
     @Autowired
     private TaskMessageService taskMessageService;
@@ -44,9 +47,18 @@ public class DownloadMediaJob {
 
     @Value("root.file.path")
     private String mediaFileRootPath;
+    @Value("yxt.ftp.downloadcount")
+    private Integer downloadCount;//控制单台任务数
 
-    @Scheduled(cron = "1 0/30 *  * * ? ")//每隔30分钟隔行一次
-    public void run(){
+
+    @Scheduled(cron = "1 0/30 *  * * ?")//每隔30分钟隔行一次
+    public synchronized void run(){
+        if ((count.get()) > downloadCount) {
+            logger.error("定时任务运行失败。当前服务的定时下载任务数已经超过了"+downloadCount+"个。暂停增加线程数。");
+            return;
+        }
+        int countV2 = count.incrementAndGet();// 自增1,返回更新值
+        logger.info("定时任务运行成功。当前服务的定时下载任务数递增到："+countV2+"个。");
         //检测文件下载
         List<Long> taskIdList = taskMessageService.findIdListTaskMessageByStatus(Constants.TaskMessageStatus.NO_DULE);
         File file = null;
@@ -57,6 +69,7 @@ public class DownloadMediaJob {
             }
             Boolean isIn = MemcacheCaller.INSTANCE.add(Constants.DOWNLOADING_TASK_KEY+"_"+taskId,60*60,"2");
             if(isIn){
+
                 //进行下载
                 taskMessage.setStatus(Constants.TaskMessageStatus.DOWNLOADING);
                 taskMessageService.addOrUpdate(taskMessage);
@@ -134,5 +147,7 @@ public class DownloadMediaJob {
                 MemcacheCaller.INSTANCE.delete(Constants.DOWNLOADING_TASK_KEY+"_"+taskId);
             }
         }
+        int countV =count.decrementAndGet();// 自减1,返回更新值
+        logger.info("定时任务运行结束。当前服务的定时下载任务数递减到："+countV+"个。");
     }
 }

@@ -71,13 +71,9 @@ public class TaskMessage extends AutoModel implements Serializable {
 
     @JsonSerialize(using=JsonDateSerializer.class)
     @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
-    @Column(name = "download_update_time")
-    private Date downloadUpdateTime;//下载完成时间
+    @Column(name = "update_time")
+    private Date updateTime;//更新时间
 
-    @JsonSerialize(using=JsonDateSerializer.class)
-    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
-    @Column(name = "dule_update_time")
-    private Date duleUpdateTime;//转码更新时间
 
     public Integer getUrlType() {
         return urlType;
@@ -183,19 +179,12 @@ public class TaskMessage extends AutoModel implements Serializable {
         this.createTime = createTime;
     }
 
-    public Date getDownloadUpdateTime() {
-        return downloadUpdateTime;
+    public Date getUpdateTime() {
+        return updateTime;
     }
 
-    public void setDownloadUpdateTime(Date downloadUpdateTime) {
-        this.downloadUpdateTime = downloadUpdateTime;
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
     }
 
-    public Date getDuleUpdateTime() {
-        return duleUpdateTime;
-    }
-
-    public void setDuleUpdateTime(Date duleUpdateTime) {
-        this.duleUpdateTime = duleUpdateTime;
-    }
 }

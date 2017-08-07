@@ -74,6 +74,7 @@ public class MediaTaskSyncController extends BaseController {
                 taskMessage.setCallbackUrl(task.getCallbackUrl());
                 taskMessage.setStatus(Constants.TaskMessageStatus.NO_DULE);
                 taskMessage.setCreateTime(new Date());
+                taskMessage.setUpdateTime(new Date());
                 taskMessage.setFileId(fileId);
                 taskMessage.setVideoId(task.getVideoId());
                 taskMessage.setVideoMd5(task.getVideoMd5());

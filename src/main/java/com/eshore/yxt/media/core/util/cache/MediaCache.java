@@ -11,6 +11,7 @@ public enum MediaCache {
 
     TASK_MESSAGE("task_message"),//任务
     MEDIA_FILE("media_file"),//视频
+    MEDIA_FILE_THREAD("media_file_thread"),//视频线程
     ;
 	
 	public static final int DEFAULT_EXP = 7200;//2个小时

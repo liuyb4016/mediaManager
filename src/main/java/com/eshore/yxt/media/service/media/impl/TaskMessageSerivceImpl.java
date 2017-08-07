@@ -54,6 +54,7 @@ public class TaskMessageSerivceImpl implements TaskMessageService {
 
     @Override
     public TaskMessage addOrUpdate(TaskMessage taskMessage) {
+        taskMessage.setUpdateTime(new Date());
         return taskMessageRepository.save(taskMessage);
     }
 
