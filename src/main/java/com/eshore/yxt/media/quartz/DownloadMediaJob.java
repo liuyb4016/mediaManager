@@ -39,7 +39,7 @@ public class DownloadMediaJob {
     @Value("yxt.ftp.sever")
     private String ftpServer;
     @Value("yxt.ftp.port")
-    private int ftpServerPort;
+    private Integer ftpServerPort;
     @Value("yxt.ftp.user")
     private String ftpServerUser;
     @Value("yxt.ftp.password")

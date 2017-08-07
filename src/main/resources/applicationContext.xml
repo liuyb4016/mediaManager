@@ -22,6 +22,9 @@
                     http://www.springframework.org/schema/cache/spring-cache-3.1.xsd">
 
 
+    <!-- 属性文件位置 -->
+    <import resource="classpath:spring-config-profile.xml"/>
+
     <!-- 注解支持 -->
     <context:annotation-config />
     
@@ -34,9 +37,6 @@
         <context:exclude-filter type="annotation"
             expression="org.springframework.stereotype.Controller" />
     </context:component-scan>
-
-    <!-- 属性文件位置 -->
-    <import resource="classpath:spring-config-profile.xml"/>
 
     <!-- 数据源 -->
     <bean id="dataSource" class="com.jolbox.bonecp.BoneCPDataSource"
