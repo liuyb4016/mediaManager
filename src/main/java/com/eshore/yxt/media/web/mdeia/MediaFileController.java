@@ -61,7 +61,7 @@ public class MediaFileController extends BaseController {
             @RequestParam("mp4File") CommonsMultipartFile mp4File, @RequestParam("imgFile") CommonsMultipartFile imgFile,
             @RequestParam(value="title",required = true) String title,@RequestParam(value="mediaDesc",required = true) String mediaDesc,
             @RequestParam(value="id",required = true) Long id) {
-		return mediaFileService.mediaFileUpload(mp4File,imgFile,title,mediaDesc,id);
+        return mediaFileService.mediaFileUpload(mp4File,imgFile,title,mediaDesc,id);
 	}
 	
 	/**

@@ -39,7 +39,7 @@ public class DownloadMediaJob {
     @Value("yxt.ftp.sever")
     private String ftpServer;
     @Value("yxt.ftp.port")
-    private Integer ftpServerPort;
+    private String ftpServerPort;
     @Value("yxt.ftp.user")
     private String ftpServerUser;
     @Value("yxt.ftp.password")
@@ -48,13 +48,15 @@ public class DownloadMediaJob {
     @Value("root.file.path")
     private String mediaFileRootPath;
     @Value("yxt.ftp.downloadcount")
-    private Integer downloadCount;//控制单台任务数
+    private String downloadCount;//控制单台任务数
 
 
     @Scheduled(cron = "1 0/30 *  * * ?")//每隔30分钟隔行一次
     public synchronized void run(){
-        if ((count.get()) > downloadCount) {
-            logger.error("定时任务运行失败。当前服务的定时下载任务数已经超过了"+downloadCount+"个。暂停增加线程数。");
+        Integer downloadCountV = Integer.valueOf(downloadCount);
+        Integer ftpServerPortV = Integer.valueOf(ftpServerPort);
+        if ((count.get()) > downloadCountV) {
+            logger.error("定时任务运行失败。当前服务的定时下载任务数已经超过了"+downloadCountV+"个。暂停增加线程数。");
             return;
         }
         int countV2 = count.incrementAndGet();// 自增1,返回更新值
@@ -94,7 +96,7 @@ public class DownloadMediaJob {
                     filePath = localPath+File.separator+fileName;
                     if(urlType==Constants.UrlType.TYPE_FTL){
                         //下载文件
-                        FtpDownloadUtil.downloadFtpFile(ftpServer,ftpServerUser,ftpServerPwd,ftpServerPort,videoUrl,localPath,fileName);
+                        FtpDownloadUtil.downloadFtpFile(ftpServer,ftpServerUser,ftpServerPwd,ftpServerPortV,videoUrl,localPath,fileName);
                     }else if(urlType==Constants.UrlType.TYPE_HTTP){
                         HttpDownloadUtil.downLoadFromUrl(videoUrl,fileName,localPath);
                     }
