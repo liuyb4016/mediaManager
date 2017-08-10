@@ -64,7 +64,7 @@ public class DownloadMediaJob {
         File file = null;
         for(Long taskId:taskIdList){
             TaskMessage taskMessage = taskMessageService.getByid(taskId);
-            if(taskMessage==null||taskMessage.getStatus()!= Constants.TaskMessageStatus.NO_DULE) {
+            if(taskMessage==null||taskMessage.getStatus().intValue()!= Constants.TaskMessageStatus.NO_DULE.intValue()) {
                 continue;
             }
             Boolean isIn = MemcacheCaller.INSTANCE.add(Constants.DOWNLOADING_TASK_KEY+"_"+taskMessage.getTaskId(),60*60,"2");
@@ -90,7 +90,7 @@ public class DownloadMediaJob {
                     }
                     String localPath = mediaFileRootPath+ File.separator+"tasktemp"+File.separator+taskMessage.getType();
                     String suffix = videoName.substring(videoName.lastIndexOf("."));
-                    fileName = taskMessage.getTaskId()+suffix;
+                    fileName = taskMessage.getTaskId()+"_0"+suffix;
                     //下载后的文件
                     filePath = localPath+File.separator+fileName;
                     if(urlType==Constants.UrlType.TYPE_FTL){
