@@ -68,6 +68,14 @@ public class MediaFile extends AutoModel implements Serializable {
 	@Column(name = "update_time")
 	private Date updateTime;
 
+    public String getTaskId() {
+        return taskId;
+    }
+
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
+    }
+
     public Integer getDefType() {
         return defType;
     }

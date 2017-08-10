@@ -64,7 +64,7 @@ public class FtpDownloadUtil {
      */
     public static void downloadFtpFile(String ftpHost, String ftpUserName,
                                        String ftpPassword, int ftpPort, String ftpPath, String localPath,
-                                       String fileName) {
+            String sourcefileName,String savefileName) {
 
         FTPClient ftpClient = null;
 
@@ -75,16 +75,15 @@ public class FtpDownloadUtil {
             ftpClient.setDataTimeout(30*60*1000);       //设置传输超时时间为60分钟
             ftpClient.enterLocalPassiveMode();
             ftpClient.changeWorkingDirectory(ftpPath);
-
             //文件保存位置
             File saveDir = new File(localPath);
             if (!saveDir.exists()) {
-                saveDir.mkdir();
+                saveDir.mkdirs();
             }
 
-            File localFile = new File(localPath + File.separatorChar + fileName);
+            File localFile = new File(localPath + File.separatorChar + savefileName);
             OutputStream os = new FileOutputStream(localFile);
-            ftpClient.retrieveFile(fileName, os);
+            ftpClient.retrieveFile(sourcefileName, os);
             os.close();
             ftpClient.logout();
 

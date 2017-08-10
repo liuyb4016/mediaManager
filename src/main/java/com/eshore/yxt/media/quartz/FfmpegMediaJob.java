@@ -28,16 +28,15 @@ public class FfmpegMediaJob {
     @Autowired
     private MediaFileService mediaFileService;
 
-    @Value("root.file.path")
+    @Value("${root.file.path}")
     private String mediaFileRootPath;
-    @Value("yxt.ftp.ffmpegcount")
-    private String ffmpegCount;
+    @Value("${yxt.ftp.ffmpegcount}")
+    private Integer ffmpegCount;
 
-    //@Scheduled(cron = "1 0/30 *  * * ? ")//每隔1秒隔行一次
+    //@Scheduled(cron = "1 0/59 *  * * ? ")//每隔1秒隔行一次
     public synchronized void run(){
-        Integer ffmpegCountV = Integer.valueOf(ffmpegCount);
-        if ((count.get()) > ffmpegCountV) {
-            logger.error("定时任务运行失败。当前服务的定时转码任务数已经超过了"+ffmpegCountV+"个。暂停增加线程数。");
+        if ((count.get()) > ffmpegCount) {
+            logger.error("定时任务运行失败。当前服务的定时转码任务数已经超过了"+ffmpegCount+"个。暂停增加线程数。");
             return;
         }
         int countV2 = count.incrementAndGet();// 自增1,返回更新值

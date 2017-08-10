@@ -36,27 +36,25 @@ public class DownloadMediaJob {
     @Autowired
     private MediaFileService mediaFileService;
 
-    @Value("yxt.ftp.sever")
+    @Value("${yxt.ftp.sever}")
     private String ftpServer;
-    @Value("yxt.ftp.port")
-    private String ftpServerPort;
-    @Value("yxt.ftp.user")
+    @Value("${yxt.ftp.port}")
+    private Integer ftpServerPort;
+    @Value("${yxt.ftp.user}")
     private String ftpServerUser;
-    @Value("yxt.ftp.password")
+    @Value("${yxt.ftp.password}")
     private String ftpServerPwd;
 
-    @Value("root.file.path")
+    @Value("${root.file.path}")
     private String mediaFileRootPath;
-    @Value("yxt.ftp.downloadcount")
-    private String downloadCount;//控制单台任务数
+    @Value("${yxt.ftp.downloadcount}")
+    private Integer downloadCount;//控制单台任务数
 
 
-    @Scheduled(cron = "1 0/30 *  * * ?")//每隔30分钟隔行一次
+    @Scheduled(cron = "1 0/1 *  * * ?")//每隔30分钟隔行一次
     public synchronized void run(){
-        Integer downloadCountV = Integer.valueOf(downloadCount);
-        Integer ftpServerPortV = Integer.valueOf(ftpServerPort);
-        if ((count.get()) > downloadCountV) {
-            logger.error("定时任务运行失败。当前服务的定时下载任务数已经超过了"+downloadCountV+"个。暂停增加线程数。");
+        if ((count.get()) > downloadCount) {
+            logger.error("定时任务运行失败。当前服务的定时下载任务数已经超过了"+downloadCount+"个。暂停增加线程数。");
             return;
         }
         int countV2 = count.incrementAndGet();// 自增1,返回更新值
@@ -69,15 +67,16 @@ public class DownloadMediaJob {
             if(taskMessage==null||taskMessage.getStatus()!= Constants.TaskMessageStatus.NO_DULE) {
                 continue;
             }
-            Boolean isIn = MemcacheCaller.INSTANCE.add(Constants.DOWNLOADING_TASK_KEY+"_"+taskId,60*60,"2");
+            Boolean isIn = MemcacheCaller.INSTANCE.add(Constants.DOWNLOADING_TASK_KEY+"_"+taskMessage.getTaskId(),60*60,"2");
             if(isIn){
 
                 //进行下载
                 taskMessage.setStatus(Constants.TaskMessageStatus.DOWNLOADING);
+                taskMessage.setDuleMessage("正在下载");
                 taskMessageService.addOrUpdate(taskMessage);
                 String filePath = null;
                 String fileName = null;
-                Long fileSize = 0L;
+                long fileSize = 0;
                 String fileMd5 = null;
                 try{
                     String videoUrl = taskMessage.getVideoUrls();
@@ -96,7 +95,7 @@ public class DownloadMediaJob {
                     filePath = localPath+File.separator+fileName;
                     if(urlType==Constants.UrlType.TYPE_FTL){
                         //下载文件
-                        FtpDownloadUtil.downloadFtpFile(ftpServer,ftpServerUser,ftpServerPwd,ftpServerPortV,videoUrl,localPath,fileName);
+                        FtpDownloadUtil.downloadFtpFile(ftpServer,ftpServerUser,ftpServerPwd,ftpServerPort,videoUrl,localPath,taskMessage.getVideoName(),fileName);
                     }else if(urlType==Constants.UrlType.TYPE_HTTP){
                         HttpDownloadUtil.downLoadFromUrl(videoUrl,fileName,localPath);
                     }
@@ -104,12 +103,12 @@ public class DownloadMediaJob {
                     // 检测对比文件是否正确，检测  文件的 大小和md5
                     File downfile = new File(filePath);
                     if(downfile==null||!downfile.exists()){
-                        throw new Exception("文件下载失败，没有检测到文件存在。taskId"+taskMessage.getTaskId());
+                        throw new Exception("文件下载失败，没有检测到文件存在。taskId="+taskMessage.getTaskId());
                     }
                     fileSize = downfile.length();
                     fileMd5 = FileDigest.getFileMD5(downfile);
-                    if(!(fileSize==size&&md5.equals(fileMd5))){
-                        throw new Exception("文件下载失败，文件已下载，但文件内容长度或md5 与接口获取的值不一致。taskId"+taskMessage.getTaskId());
+                    if(fileSize!=size.longValue()||!md5.equals(fileMd5)){
+                        throw new Exception("文件下载失败，文件已下载，但文件内容长度或md5 与接口获取的值不一致。taskId="+taskMessage.getTaskId());
                     }
                 }catch(Exception e){
                     logger.error("DownloadMediaJob error-->,{}",e);
@@ -120,7 +119,7 @@ public class DownloadMediaJob {
                         }
                     }
                     //删除标记
-                    MemcacheCaller.INSTANCE.delete(Constants.DOWNLOADING_TASK_KEY+"_"+taskId);
+                    MemcacheCaller.INSTANCE.delete(Constants.DOWNLOADING_TASK_KEY+"_"+taskMessage.getTaskId());
 
                     taskMessage.setStatus(Constants.TaskMessageStatus.DOWNLOAD_ERROR);
                     taskMessage.setDuleMessage(e.getMessage());
@@ -130,10 +129,12 @@ public class DownloadMediaJob {
 
                 //下载完成
                 taskMessage.setStatus(Constants.TaskMessageStatus.DOWNLOADED);
+                taskMessage.setDuleMessage("下载成功");
                 taskMessageService.addOrUpdate(taskMessage);
 
                 //新增数据视频源文件记录
                 MediaFile mediaFile = new MediaFile();
+                mediaFile.setTaskId(taskMessage.getTaskId()+"_0");
                 mediaFile.setSourceId(0L);
                 mediaFile.setDefType(0);
                 mediaFile.setFileName(fileName);
@@ -146,7 +147,7 @@ public class DownloadMediaJob {
                 mediaFileService.addOrUpdate(mediaFile);
 
                 //删除标记
-                MemcacheCaller.INSTANCE.delete(Constants.DOWNLOADING_TASK_KEY+"_"+taskId);
+                MemcacheCaller.INSTANCE.delete(Constants.DOWNLOADING_TASK_KEY+"_"+taskMessage.getTaskId());
             }
         }
         int countV =count.decrementAndGet();// 自减1,返回更新值
