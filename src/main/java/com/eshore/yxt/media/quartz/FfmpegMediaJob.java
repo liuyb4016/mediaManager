@@ -74,6 +74,7 @@ public class FfmpegMediaJob {
                 String localPath = String.format(mediaFileRootPath + File.separator + "task" + File.separator + taskMessage.getType()
                         + File.separator + DateFormatUtils.format(new Date(),"yyyyMMdd"))+File.separator +taskMessage.getTaskId();
                 String fileName = mediaFile.getFileName();
+                sourceFile = localPath+File.separator+mediaFile.getFileName();
                 file = new File(sourceFile);
                 if(!file.exists()){
                     throw new Exception("下载的文件不存在，无法进行转码。mediaFile="+mediaFile.getFileId());
@@ -192,11 +193,11 @@ public class FfmpegMediaJob {
             //-i before-code.flv -vcodec h264 -s 960×720 -pix_fmt yuv420p -acodec aac 20170801_1.mp4
             String params = "";
             if("1".equals(type)){//480x270
-                params = " -vcodec h264 -s 480x270 -pix_fmt yuv420p -acodec aac -y";
+                params = " -vcodec h264 -s 480x270 -pix_fmt yuv420p -acodec aac -y ";
             }else if("2".equals(type)){//960×720
-                params = " -vcodec h264 -s 960×720 -pix_fmt yuv420p -acodec aac -y ";
+                params = " -vcodec h264 -s 960x720 -pix_fmt yuv420p -acodec aac -y ";
             }
-            String cmd = filename+" -i "+sourceFile+params+targetFile+File.separator+fileName;
+            String cmd = filename+" -loglevel quiet -i "+sourceFile+params+targetFile+File.separator+fileName;
             logger.info("ffmpeg video cmd = {}", cmd);
             proc = Runtime.getRuntime().exec(cmd);
             in = proc.getInputStream();
