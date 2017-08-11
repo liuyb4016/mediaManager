@@ -1,11 +1,14 @@
 package com.eshore.yxt.media.quartz;
 
 import com.eshore.yxt.media.core.constants.Constants;
+import com.eshore.yxt.media.core.util.JsonHttpUtil;
+import com.eshore.yxt.media.core.util.media.FileDigest;
 import com.eshore.yxt.media.model.media.MediaFile;
 import com.eshore.yxt.media.model.media.TaskMessage;
 import com.eshore.yxt.media.service.media.MediaFileService;
 import com.eshore.yxt.media.service.media.TaskMessageService;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,8 +59,9 @@ public class FfmpegMediaJob {
         //获得已下载完成的列表
         List<Long> taskIdList = taskMessageService.findIdListTaskMessageByStatus(Constants.TaskMessageStatus.DOWNLOADED);
         File file = null;
-        String filePath = null;
-        //循环处理
+        String sourceFile = null;
+        MediaFile mediaFileV = null;
+                //循环处理
         TaskMessage taskMessage = null;
         for(Long taskId:taskIdList){
             try{
@@ -67,10 +71,10 @@ public class FfmpegMediaJob {
                 }
                 //判断文件是否存在，进行转码处理
                 MediaFile mediaFile = mediaFileService.getMediaFileBTaskId(taskMessage.getTaskId()+"_0");
-                String localPath = mediaFileRootPath+ File.separator+"tasktemp"+File.separator+taskMessage.getType();
+                String localPath = String.format(mediaFileRootPath + File.separator + "task" + File.separator + taskMessage.getType()
+                        + File.separator + DateFormatUtils.format(new Date(),"yyyyMMdd"))+File.separator +taskMessage.getTaskId();
                 String fileName = mediaFile.getFileName();
-                filePath = localPath+File.separator+fileName;
-                file = new File(filePath);
+                file = new File(sourceFile);
                 if(!file.exists()){
                     throw new Exception("下载的文件不存在，无法进行转码。mediaFile="+mediaFile.getFileId());
                 }
@@ -79,25 +83,64 @@ public class FfmpegMediaJob {
                 taskMessage.setStatus(Constants.TaskMessageStatus.FFMPEGING);
                 taskMessage.setDuleMessage("文件转码中");
                 taskMessageService.addOrUpdate(taskMessage);
-                //todo 转码  标清  高清
+                mediaFileV = mediaFileService.getMediaFileBTaskId(taskMessage.getTaskId()+"_1");
+                if(mediaFileV==null){
+                    Boolean isSucc1 = ffmpegVideo(sourceFile,localPath,taskMessage.getTaskId()+"_1.mp4","1");
+                    if(isSucc1){
+                        File fileV =  new File(localPath+File.separator+taskMessage.getTaskId()+"_1.mp4");
+                        if(fileV!=null&&fileV.exists()&& fileV.length()>0){
+                            mediaFileV = new MediaFile();
+                            mediaFileV.setTaskId(taskMessage.getTaskId()+"_1");
+                            mediaFileV.setSourceId(mediaFile.getId());
+                            mediaFileV.setDefType(1);
+                            mediaFileV.setFileName(taskMessage.getTaskId()+"_1.mp4");
+                            mediaFileV.setMd5(FileDigest.getFileMD5(fileV));
+                            mediaFileV.setSize(fileV.length());
+                            mediaFileV.setType(taskMessage.getType());
+                            mediaFileV.setFileId(taskMessage.getFileId());
+                            mediaFileV.setCreateTime(new Date());
+                            mediaFileV.setUpdateTime(new Date());
+                            mediaFileService.addOrUpdate(mediaFileV);
+                        }
+                    }
+                }
+
+                mediaFileV = mediaFileService.getMediaFileBTaskId(taskMessage.getTaskId()+"_2");
+                if(mediaFileV==null){
+                    Boolean isSucc2 = ffmpegVideo(sourceFile,localPath,taskMessage.getTaskId()+"_2.mp4","2");
+                    if(isSucc2){
+                        File fileV =  new File(localPath+File.separator+taskMessage.getTaskId()+"_2.mp4");
+                        if(fileV!=null&&fileV.exists()&& fileV.length()>0){
+                            mediaFileV = new MediaFile();
+                            mediaFileV.setTaskId(taskMessage.getTaskId()+"_2");
+                            mediaFileV.setSourceId(mediaFile.getId());
+                            mediaFileV.setDefType(2);
+                            mediaFileV.setFileName(taskMessage.getTaskId()+"_2.mp4");
+                            mediaFileV.setMd5(FileDigest.getFileMD5(fileV));
+                            mediaFileV.setSize(fileV.length());
+                            mediaFileV.setType(taskMessage.getType());
+                            mediaFileV.setFileId(taskMessage.getFileId());
+                            mediaFileV.setCreateTime(new Date());
+                            mediaFileV.setUpdateTime(new Date());
+                            mediaFileService.addOrUpdate(mediaFileV);
+                        }
+                    }
+                }
 
                 //转码完成
-                taskMessage.setStatus(Constants.TaskMessageStatus.FFMPEGED);
-                taskMessage.setDuleMessage("文件完成转码");
+                taskMessage.setStatus(Constants.TaskMessageStatus.CALLBACKING);
+                taskMessage.setDuleMessage("文件完成转码,回调发送第三方结果");
                 taskMessageService.addOrUpdate(taskMessage);
                 ///转码完成。新增视频文件数据
-
-                //发送回调数据给第三方
-                taskMessage.setStatus(Constants.TaskMessageStatus.CALLBACKING);
-                taskMessage.setDuleMessage("回调发送第三方结果");
-                taskMessageService.addOrUpdate(taskMessage);
-
-
-                //完成转码流程
-                taskMessage.setStatus(Constants.TaskMessageStatus.DULED);
-                taskMessage.setDuleMessage("转码流程处理完成");
-                taskMessageService.addOrUpdate(taskMessage);
-
+                String result = JsonHttpUtil.doPost(taskMessage.getCallbackUrl(),"{}");
+                if("ok".equals(result)){
+                    //完成转码流程
+                    taskMessage.setStatus(Constants.TaskMessageStatus.DULED);
+                    taskMessage.setDuleMessage("转码流程处理完成");
+                    taskMessageService.addOrUpdate(taskMessage);
+                }else{
+                    logger.error("FfmpegMediaJob error 回调第三方结果失败，信息为："+result);
+                }
             }catch (Exception e){
                 logger.error("FfmpegMediaJob error-->,{}",e);
                 taskMessage.setStatus(Constants.TaskMessageStatus.FFMPEGED);
@@ -122,7 +165,8 @@ public class FfmpegMediaJob {
      * @return void    返回类型
      * @throws
      */
-    public void ffmpegVideo(String sourceFile,String targetFile,String fileName,String type){
+    public Boolean ffmpegVideo(String sourceFile,String targetFile,String fileName,String type){
+        Boolean isSuccess = true;
         File parentdir = new File(targetFile);
         if (!parentdir.exists()) {
             parentdir.mkdirs();
@@ -161,13 +205,16 @@ public class FfmpegMediaJob {
             while ((line = br.readLine()) != null) {
                 logger.info("ffmpeg video {}", line);
             }
+
         } catch (Exception e) {
             logger.error("ffmpeg video error", e);
             e.printStackTrace();
+            isSuccess = false;
         } finally {
             IOUtils.closeQuietly(in);
             if (proc != null)
                 proc.destroy();
         }
+        return isSuccess;
     }
 }

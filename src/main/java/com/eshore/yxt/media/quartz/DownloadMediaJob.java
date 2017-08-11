@@ -12,6 +12,7 @@ import com.eshore.yxt.media.service.media.MediaFileService;
 import com.eshore.yxt.media.service.media.TaskMessageService;
 import com.eshore.yxt.media.service.media.impl.MediaFileSerivceImpl;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,7 +89,8 @@ public class DownloadMediaJob {
                     if(StringUtils.isBlank(videoUrl)||!(urlType==Constants.UrlType.TYPE_FTL||urlType==Constants.UrlType.TYPE_HTTP)){
                         throw new Exception("文件下载地址不正确。taskId="+taskMessage.getTaskId()+"--URLType="+urlType+"----> videoUrl="+videoUrl);
                     }
-                    String localPath = mediaFileRootPath+ File.separator+"tasktemp"+File.separator+taskMessage.getType();
+                    String localPath = String.format(mediaFileRootPath + File.separator + "task" + File.separator + taskMessage.getType()
+                            + File.separator + DateFormatUtils.format(new Date(),"yyyyMMdd"))+File.separator +taskMessage.getTaskId();
                     String suffix = videoName.substring(videoName.lastIndexOf("."));
                     fileName = taskMessage.getTaskId()+"_0"+suffix;
                     //下载后的文件
