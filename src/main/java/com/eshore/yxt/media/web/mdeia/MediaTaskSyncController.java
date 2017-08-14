@@ -5,6 +5,7 @@ import com.eshore.yxt.media.core.util.cache.MediaCache;
 import com.eshore.yxt.media.core.util.cache.MemcacheCaller;
 import com.eshore.yxt.media.model.media.TaskMessage;
 import com.eshore.yxt.media.service.media.MediaFileService;
+import com.eshore.yxt.media.service.media.TaskLogService;
 import com.eshore.yxt.media.service.media.TaskMessageService;
 import com.eshore.yxt.media.web.base.Grid;
 import com.eshore.yxt.media.web.base.Pager;
@@ -33,11 +34,10 @@ import java.util.UUID;
 @RequestMapping(value="/mediaTask")
 public class MediaTaskSyncController extends BaseController {
 
-
-	@Autowired
-	private MediaFileService mediaFileService;
     @Autowired
     private TaskMessageService taskMessageService;
+    @Autowired
+    private TaskLogService taskLogService;
 
 	@RequestMapping("/createtask")
 	@ResponseBody
@@ -58,6 +58,7 @@ public class MediaTaskSyncController extends BaseController {
         }
 
         Boolean isIn =  MemcacheCaller.INSTANCE.add(Constants.CREATE_TASK_KEY+"_"+type+"_"+fileId, 2, "2");
+
         try{
             if(isIn){
                 TaskMessage taskMessage = taskMessageService.getTaskMessageByFileId(type,fileId);
@@ -76,13 +77,13 @@ public class MediaTaskSyncController extends BaseController {
                 taskMessage.setCreateTime(new Date());
                 taskMessage.setUpdateTime(new Date());
                 taskMessage.setFileId(fileId);
-                taskMessage.setVideoId(task.getVideoId());
                 taskMessage.setVideoMd5(task.getVideoMd5());
                 taskMessage.setVideoName(task.getVideoName());
                 taskMessage.setVideoSize(task.getVideoSize());
-                taskMessage.setUrlType(task.getUrlType());
-                taskMessage.setVideoUrls(task.getVideoUrl());
+                taskMessage.setVideoUrl(task.getVideoUrl());
                 taskMessageService.addOrUpdate(taskMessage);
+                taskLogService.addLog(taskMessage.getTaskId(),1,"成功创建任务");
+
                 MemcacheCaller.INSTANCE.delete(Constants.CREATE_TASK_KEY+"_"+type+"_"+fileId);
             }else{
                 taskMessageResq.setStatus("-10003");

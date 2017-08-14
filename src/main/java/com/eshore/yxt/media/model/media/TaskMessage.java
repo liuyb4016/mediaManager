@@ -37,9 +37,6 @@ public class TaskMessage extends AutoModel implements Serializable {
     @Column(name = "file_id")
     private String fileId;//文件ID
 
-    @Column(name = "video_id")
-    private String videoId;//视频ID
-
     @Column(name = "video_name")
     private String videoName;//视频名称
 
@@ -49,17 +46,11 @@ public class TaskMessage extends AutoModel implements Serializable {
     @Column(name = "video_md5")
     private String videoMd5;//视频md5
 
-    @Column(name = "url_type")
-    private Integer urlType;//视频下载地址类型  1：ftp://  2：http://
-
-    @Column(name = "video_urls")
-    private String videoUrls;//视频下载地址 支持ftp://   http://  下载
+    @Column(name = "video_url")
+    private String videoUrl;//默认使用ftp的方式
 
     @Column(name = "status")
     private Integer status;//处理状态  0未处理 1 正在下载  2 已下载   3 正在转码处理 4 转码已处理     5 正在回调通知给第三方 6 已完成处理 -1 下载处理出错 -2 转码处理出错
-
-    @Column(name = "dule_message")
-    private String duleMessage;//处理结果描述
 
     @Column(name = "callback_url")
     private String callbackUrl;//处理结果回调  提供一个接收结果的接口
@@ -73,15 +64,6 @@ public class TaskMessage extends AutoModel implements Serializable {
     @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     @Column(name = "update_time")
     private Date updateTime;//更新时间
-
-
-    public Integer getUrlType() {
-        return urlType;
-    }
-
-    public void setUrlType(Integer urlType) {
-        this.urlType = urlType;
-    }
 
     public String getTaskId() {
         return taskId;
@@ -105,14 +87,6 @@ public class TaskMessage extends AutoModel implements Serializable {
 
     public void setFileId(String fileId) {
         this.fileId = fileId;
-    }
-
-    public String getVideoId() {
-        return videoId;
-    }
-
-    public void setVideoId(String videoId) {
-        this.videoId = videoId;
     }
 
     public String getVideoName() {
@@ -139,12 +113,12 @@ public class TaskMessage extends AutoModel implements Serializable {
         this.videoMd5 = videoMd5;
     }
 
-    public String getVideoUrls() {
-        return videoUrls;
+    public String getVideoUrl() {
+        return videoUrl;
     }
 
-    public void setVideoUrls(String videoUrls) {
-        this.videoUrls = videoUrls;
+    public void setVideoUrl(String videoUrl) {
+        this.videoUrl = videoUrl;
     }
 
     public Integer getStatus() {
@@ -153,14 +127,6 @@ public class TaskMessage extends AutoModel implements Serializable {
 
     public void setStatus(Integer status) {
         this.status = status;
-    }
-
-    public String getDuleMessage() {
-        return duleMessage;
-    }
-
-    public void setDuleMessage(String duleMessage) {
-        this.duleMessage = duleMessage;
     }
 
     public String getCallbackUrl() {
@@ -186,5 +152,4 @@ public class TaskMessage extends AutoModel implements Serializable {
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
     }
-
 }

@@ -32,4 +32,14 @@ public interface TaskMessageService {
     public List<Long> findIdListTaskMessageByStatus(Integer status);
 
     TaskMessage getByid(Long id);
+
+    public Boolean duleDownload(Long taskId);
+
+    public Boolean ffmpegVideo270P(Long taskId);
+
+    public Boolean ffmpegVideo720P(Long taskId);
+
+    public Boolean callBackUrl(Long taskId);
+
+    public Boolean ffmpegVideo(String sourceFile,String targetFile,String fileName,String type);
 }

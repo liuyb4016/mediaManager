@@ -1,5 +1,7 @@
 package com.eshore.yxt.media.web.mdeia.req;
 
+import com.eshore.yxt.media.model.media.TaskMessage;
+
 import javax.persistence.Column;
 import java.io.Serializable;
 
@@ -11,26 +13,15 @@ public class TaskMessageReq implements Serializable {
 
     private String fileId;//文件ID
 
-    private String videoId;//视频ID
-
     private String videoName;//视频名称
 
     private Long videoSize;//视频大小
 
     private String videoMd5;//视频md5
 
-    private Integer urlType;//视频下载地址  1 :ftp 相对路径   2: http://
     private String videoUrl;//视频下载路径
 
     private String callbackUrl;//处理结果回调  提供一个接收结果的接口
-
-    public Integer getUrlType() {
-        return urlType;
-    }
-
-    public void setUrlType(Integer urlType) {
-        this.urlType = urlType;
-    }
 
     public String getType() {
         return type;
@@ -46,14 +37,6 @@ public class TaskMessageReq implements Serializable {
 
     public void setFileId(String fileId) {
         this.fileId = fileId;
-    }
-
-    public String getVideoId() {
-        return videoId;
-    }
-
-    public void setVideoId(String videoId) {
-        this.videoId = videoId;
     }
 
     public String getVideoName() {
@@ -95,4 +78,5 @@ public class TaskMessageReq implements Serializable {
     public void setCallbackUrl(String callbackUrl) {
         this.callbackUrl = callbackUrl;
     }
+
 }

@@ -13,17 +13,14 @@ import java.util.List;
 
 public interface TaskMessageRepository extends CrudRepository<TaskMessage, Long>,JpaSpecificationExecutor<TaskMessage> {
 
-    @Query("from TaskMessage taskMessage where taskMessage.type = ?1 and taskMessage.fileId=?2 ")
+    @Query("select taskMessage from TaskMessage taskMessage where taskMessage.type = ?1 and taskMessage.fileId=?2 ")
     public TaskMessage getTaskMessageByFileId(String type,String fileId);
 
-    @Query("from TaskMessage taskMessage where taskMessage.status=?1 ")
+    @Query("select taskMessage from TaskMessage taskMessage where taskMessage.status=?1 ")
     public List<TaskMessage> findListTaskMessageByStatus(Integer status);
 
     @Query("SELECT taskMessage.id from TaskMessage taskMessage where taskMessage.status=?1 ")
     public List<Long> findIdListTaskMessageByStatus(Integer status);
 
-    /*@Modifying
-    @Query("update TaskMessage u set u.status = ?1 where u.id=?2")
-    public int updateStatus(Integer status,Long id);*/
 }
 
