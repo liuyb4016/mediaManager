@@ -1,5 +1,6 @@
 package com.eshore.yxt.media.service.media.impl;
 
+import cn.eshore.common.util.http.HttpUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.eshore.yxt.media.core.constants.Constants;
 import com.eshore.yxt.media.core.util.FtpDownloadUtil;
@@ -350,7 +351,9 @@ public class TaskMessageSerivceImpl implements TaskMessageService {
             JSONArray jsonArray=new JSONArray();//1、创建JSONArray
             jsonArray.addAll(listNew);
             String jsonstr = jsonArray.toJSONString();
-            String result = JsonHttpUtil.doPost(taskMessage.getCallbackUrl(),jsonstr);
+            HashMap<String,String> paramsMap = new HashMap<String, String>();
+            paramsMap.put("result",jsonstr);
+            String result = HttpUtil.doPost(taskMessage.getCallbackUrl(),paramsMap);
 
             if("ok".equals(result)){
                 //完成转码流程
