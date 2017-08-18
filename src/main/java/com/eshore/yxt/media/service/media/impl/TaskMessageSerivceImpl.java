@@ -1,5 +1,6 @@
 package com.eshore.yxt.media.service.media.impl;
 
+import com.alibaba.fastjson.JSONArray;
 import com.eshore.yxt.media.core.constants.Constants;
 import com.eshore.yxt.media.core.util.FtpDownloadUtil;
 import com.eshore.yxt.media.core.util.JsonHttpUtil;
@@ -16,6 +17,7 @@ import com.eshore.yxt.media.web.base.Grid;
 import com.eshore.yxt.media.web.base.Pager;
 import com.eshore.yxt.media.web.base.Result;
 import com.eshore.yxt.media.web.mdeia.req.MediaFileReq;
+import com.eshore.yxt.media.web.mdeia.resp.TaskMessageResq;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
@@ -60,6 +62,8 @@ public class TaskMessageSerivceImpl implements TaskMessageService {
     private String ftpServerPwd;
 
 
+    @Value("${http.res.url}")
+    private String httpResUrl;
     @Value("${root.file.path}")
     private String mediaFileRootPath;
     @Value("${voicerecord.ffmpeg.path.linux}")
@@ -193,9 +197,8 @@ public class TaskMessageSerivceImpl implements TaskMessageService {
             }
             //判断文件是否存在，进行转码处理
             MediaFile mediaFile = mediaFileService.getMediaFileBTaskId(taskMessage.getTaskId()+"_0");
-            String localPath = String.format(mediaFileRootPath + File.separator + "task" + File.separator + taskMessage.getType()
-                    + File.separator + DateFormatUtils.format(new Date(),"yyyyMMdd"))+File.separator +taskMessage.getTaskId();
-            String fileName = mediaFile.getFileName();
+            String localPath = mediaFileRootPath + File.separator + "task" + File.separator + taskMessage.getType()
+                    + File.separator + DateFormatUtils.format(new Date(),"yyyyMMdd")+File.separator +taskMessage.getTaskId();
             sourceFile = localPath+File.separator+mediaFile.getFileName();
             file = new File(sourceFile);
             if(!file.exists()){
@@ -265,9 +268,8 @@ public class TaskMessageSerivceImpl implements TaskMessageService {
             }
             //判断文件是否存在，进行转码处理
             MediaFile mediaFile = mediaFileService.getMediaFileBTaskId(taskMessage.getTaskId()+"_0");
-            String localPath = String.format(mediaFileRootPath + File.separator + "task" + File.separator + taskMessage.getType()
-                    + File.separator + DateFormatUtils.format(new Date(),"yyyyMMdd"))+File.separator +taskMessage.getTaskId();
-            String fileName = mediaFile.getFileName();
+            String localPath = mediaFileRootPath + File.separator + "task" + File.separator + taskMessage.getType()
+                    + File.separator + DateFormatUtils.format(new Date(),"yyyyMMdd")+File.separator +taskMessage.getTaskId();
             sourceFile = localPath+File.separator+mediaFile.getFileName();
             file = new File(sourceFile);
             if(!file.exists()){
@@ -329,15 +331,27 @@ public class TaskMessageSerivceImpl implements TaskMessageService {
         MediaFile mediaFileV = null;
         try{
             taskMessage = this.getByid(taskId);
-            if(taskMessage==null||taskMessage.getStatus().intValue()!= Constants.TaskMessageStatus.FFMPEG270ED.intValue()){
+            if(taskMessage==null||taskMessage.getStatus().intValue()!= Constants.TaskMessageStatus.FFMPEG720ED.intValue()){
                 return false;
             }
+
             //转码完成
             taskMessage.setStatus(Constants.TaskMessageStatus.CALLBACKING);
             this.addOrUpdate(taskMessage);
             taskLogService.addLog(taskMessage.getTaskId(),1,"文件完成转码,准备回调发送第三方结果");
             ///转码完成。新增视频文件数据
-            String result = JsonHttpUtil.doPost(taskMessage.getCallbackUrl(),"{}");
+            MediaFile mediaFile1 = mediaFileService.getMediaFileBTaskId(taskMessage.getTaskId()+"_1");
+            MediaFile mediaFile2 = mediaFileService.getMediaFileBTaskId(taskMessage.getTaskId()+"_2");
+            //类型  1 标清  2 高清
+            List<TaskMessageResq> listNew = new ArrayList<TaskMessageResq>();
+            if(mediaFile1!=null) listNew.add(new TaskMessageResq(mediaFile1.getFileId(),mediaFile1.getType()+"",getMediaUrl(taskMessage,mediaFile1)));
+            if(mediaFile2!=null) listNew.add(new TaskMessageResq(mediaFile2.getFileId(),mediaFile2.getType()+"",getMediaUrl(taskMessage,mediaFile2)));
+
+            JSONArray jsonArray=new JSONArray();//1、创建JSONArray
+            jsonArray.addAll(listNew);
+            String jsonstr = jsonArray.toJSONString();
+            String result = JsonHttpUtil.doPost(taskMessage.getCallbackUrl(),jsonstr);
+
             if("ok".equals(result)){
                 //完成转码流程
                 taskMessage.setStatus(Constants.TaskMessageStatus.DULED);
@@ -360,7 +374,11 @@ public class TaskMessageSerivceImpl implements TaskMessageService {
         return true;
     }
 
-
+    private String getMediaUrl(TaskMessage taskMessage,MediaFile mediaFile){
+        String localPath = httpResUrl + File.separator + "task" + File.separator + taskMessage.getType()
+                + File.separator + DateFormatUtils.format(new Date(),"yyyyMMdd")+File.separator +taskMessage.getTaskId();
+        return localPath+File.separator+mediaFile.getFileName();
+    }
 
     /**
      *

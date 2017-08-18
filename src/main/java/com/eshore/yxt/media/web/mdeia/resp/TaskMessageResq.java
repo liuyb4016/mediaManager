@@ -5,18 +5,30 @@ import java.util.List;
 
 public class TaskMessageResq implements Serializable {
 
-
     private static final long serialVersionUID = 572899711532001517L;
 
-    private String type;//数据id  1 院线通片花
+    public TaskMessageResq(){
+    }
+
+    public TaskMessageResq(String fileId,String type,String url){
+        this.fileId = fileId;
+        this.type = type;
+        this.url = url;
+    }
 
     private String fileId;//文件ID
-
+    private String type;//类型  1 标清  2 高清
+    private String url;// 链接
     private String status;//0 成功  -1 失败
-
     private String errorMsg;// 错误信息
 
-    private List<String> videoUrls;//视频地址
+    public String getFileId() {
+        return fileId;
+    }
+
+    public void setFileId(String fileId) {
+        this.fileId = fileId;
+    }
 
     public String getType() {
         return type;
@@ -26,12 +38,12 @@ public class TaskMessageResq implements Serializable {
         this.type = type;
     }
 
-    public String getFileId() {
-        return fileId;
+    public String getUrl() {
+        return url;
     }
 
-    public void setFileId(String fileId) {
-        this.fileId = fileId;
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     public String getStatus() {
@@ -48,13 +60,5 @@ public class TaskMessageResq implements Serializable {
 
     public void setErrorMsg(String errorMsg) {
         this.errorMsg = errorMsg;
-    }
-
-    public List<String> getVideoUrls() {
-        return videoUrls;
-    }
-
-    public void setVideoUrls(List<String> videoUrls) {
-        this.videoUrls = videoUrls;
     }
 }

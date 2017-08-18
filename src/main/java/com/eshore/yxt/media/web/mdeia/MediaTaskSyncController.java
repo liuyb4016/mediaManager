@@ -46,7 +46,6 @@ public class MediaTaskSyncController extends BaseController {
         TaskMessageResq taskMessageResq = new TaskMessageResq();
         String type = task.getType();
         String fileId = task.getFileId();
-
         taskMessageResq.setType(type);
         taskMessageResq.setFileId(fileId);
 
