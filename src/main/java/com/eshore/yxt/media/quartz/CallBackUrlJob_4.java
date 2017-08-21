@@ -40,7 +40,7 @@ public class CallBackUrlJob_4 {
         logger.info("回调第三方  定时任务运行成功。当前服务的定时转码任务数递增到："+countV2+"个。");
 
         //获得已下载完成的列表
-        List<Long> taskIdList = taskMessageService.findIdListTaskMessageByStatus(Constants.TaskMessageStatus.DOWNLOADED);
+        List<Long> taskIdList = taskMessageService.findIdListTaskMessageByStatus(Constants.TaskMessageStatus.FFMPEG720ED);
         for(Long taskId:taskIdList){
             taskMessageService.callBackUrl(taskId);
 

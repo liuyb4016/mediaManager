@@ -14,7 +14,7 @@ import java.util.List;
 public interface TaskMessageRepository extends CrudRepository<TaskMessage, Long>,JpaSpecificationExecutor<TaskMessage> {
 
     @Query("select taskMessage from TaskMessage taskMessage where taskMessage.type = ?1 and taskMessage.fileId=?2 ")
-    public TaskMessage getTaskMessageByFileId(String type,String fileId);
+    public TaskMessage getTaskMessageByFileId(Integer type,String fileId);
 
     @Query("select taskMessage from TaskMessage taskMessage where taskMessage.status=?1 ")
     public List<TaskMessage> findListTaskMessageByStatus(Integer status);

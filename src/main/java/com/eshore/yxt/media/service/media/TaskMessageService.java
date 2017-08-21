@@ -13,7 +13,7 @@ import java.util.List;
 
 public interface TaskMessageService {
 
-    TaskMessage getTaskMessageByFileId(String type,String fileId);
+    TaskMessage getTaskMessageByFileId(Integer type,String fileId);
 
     TaskMessage addOrUpdate(TaskMessage taskMessage);
 

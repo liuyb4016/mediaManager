@@ -4,6 +4,7 @@ import cn.eshore.common.util.http.HttpUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.eshore.yxt.media.core.constants.Constants;
 import com.eshore.yxt.media.core.util.FtpDownloadUtil;
+import com.eshore.yxt.media.core.util.HttpUtils;
 import com.eshore.yxt.media.core.util.JsonHttpUtil;
 import com.eshore.yxt.media.core.util.cache.MemcacheCaller;
 import com.eshore.yxt.media.core.util.media.FileDigest;
@@ -22,6 +23,8 @@ import com.eshore.yxt.media.web.mdeia.resp.TaskMessageResq;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
+import org.apache.http.HttpEntity;
+import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,7 +78,7 @@ public class TaskMessageSerivceImpl implements TaskMessageService {
     public static final String WINDOW_OS = "Windows";
 
     @Override
-    public TaskMessage getTaskMessageByFileId(String type,String fileId) {
+    public TaskMessage getTaskMessageByFileId(Integer type,String fileId) {
         return taskMessageRepository.getTaskMessageByFileId(type,fileId);
     }
 
@@ -345,17 +348,16 @@ public class TaskMessageSerivceImpl implements TaskMessageService {
             MediaFile mediaFile2 = mediaFileService.getMediaFileBTaskId(taskMessage.getTaskId()+"_2");
             //类型  1 标清  2 高清
             List<TaskMessageResq> listNew = new ArrayList<TaskMessageResq>();
-            if(mediaFile1!=null) listNew.add(new TaskMessageResq(mediaFile1.getFileId(),mediaFile1.getType()+"",getMediaUrl(taskMessage,mediaFile1)));
-            if(mediaFile2!=null) listNew.add(new TaskMessageResq(mediaFile2.getFileId(),mediaFile2.getType()+"",getMediaUrl(taskMessage,mediaFile2)));
+            if(mediaFile1!=null) listNew.add(new TaskMessageResq(mediaFile1.getFileId(),mediaFile1.getDefType()+"",getMediaUrl(taskMessage,mediaFile1)));
+            if(mediaFile2!=null) listNew.add(new TaskMessageResq(mediaFile2.getFileId(),mediaFile2.getDefType()+"",getMediaUrl(taskMessage,mediaFile2)));
 
             JSONArray jsonArray=new JSONArray();//1、创建JSONArray
             jsonArray.addAll(listNew);
             String jsonstr = jsonArray.toJSONString();
-            HashMap<String,String> paramsMap = new HashMap<String, String>();
+            Map<String,String> paramsMap = new HashMap<String, String>();
             paramsMap.put("result",jsonstr);
-            String result = HttpUtil.doPost(taskMessage.getCallbackUrl(),paramsMap);
-
-            if("ok".equals(result)){
+            String result = HttpUtils.requestByPostMethod(taskMessage.getCallbackUrl(),paramsMap);
+            if("\"ok\"".equals(result)){
                 //完成转码流程
                 taskMessage.setStatus(Constants.TaskMessageStatus.DULED);
                 this.addOrUpdate(taskMessage);
@@ -378,9 +380,9 @@ public class TaskMessageSerivceImpl implements TaskMessageService {
     }
 
     private String getMediaUrl(TaskMessage taskMessage,MediaFile mediaFile){
-        String localPath = httpResUrl + File.separator + "task" + File.separator + taskMessage.getType()
-                + File.separator + DateFormatUtils.format(new Date(),"yyyyMMdd")+File.separator +taskMessage.getTaskId();
-        return localPath+File.separator+mediaFile.getFileName();
+        String localPath = httpResUrl + "/task/" + taskMessage.getType()
+                + "/"+ DateFormatUtils.format(new Date(),"yyyyMMdd")+"/" +taskMessage.getTaskId();
+        return localPath+"/"+mediaFile.getFileName();
     }
 
     /**

@@ -1,32 +1,25 @@
 package com.eshore.yxt.media.web.mdeia;
 
 import com.eshore.yxt.media.core.constants.Constants;
-import com.eshore.yxt.media.core.util.cache.MediaCache;
 import com.eshore.yxt.media.core.util.cache.MemcacheCaller;
 import com.eshore.yxt.media.model.media.TaskMessage;
-import com.eshore.yxt.media.service.media.MediaFileService;
 import com.eshore.yxt.media.service.media.TaskLogService;
 import com.eshore.yxt.media.service.media.TaskMessageService;
-import com.eshore.yxt.media.web.base.Grid;
-import com.eshore.yxt.media.web.base.Pager;
-import com.eshore.yxt.media.web.base.Result;
-import com.eshore.yxt.media.web.mdeia.req.MediaFileReq;
 import com.eshore.yxt.media.web.mdeia.req.TaskMessageReq;
 import com.eshore.yxt.media.web.mdeia.resp.TaskMessageResq;
 import com.eshore.yxt.media.web.system.BaseController;
-import org.activiti.engine.TaskService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
-import org.apache.commons.lang3.time.DateUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
-import java.text.DateFormat;
 import java.util.Date;
 import java.util.UUID;
 
@@ -34,33 +27,40 @@ import java.util.UUID;
 @RequestMapping(value="/mediaTask")
 public class MediaTaskSyncController extends BaseController {
 
+    public static final Logger logger = LoggerFactory.getLogger(MediaTaskSyncController.class);
     @Autowired
     private TaskMessageService taskMessageService;
     @Autowired
     private TaskLogService taskLogService;
 
-	@RequestMapping("/createtask")
+	@RequestMapping(value = "/createtask",method = RequestMethod.POST)
 	@ResponseBody
-	public TaskMessageResq createtask(@RequestParam(value="task",required = true) TaskMessageReq task) {
-
+	public TaskMessageResq createtask(@RequestParam(value="type",required = true)  String type,
+                                      @RequestParam(value="fileId",required = true)  String fileId,
+                                      @RequestParam(value="videoName",required = true)  String videoName,
+                                      @RequestParam(value="videoSize",required = true)  String videoSize,
+                                      @RequestParam(value="videoMd5",required = true)  String videoMd5,
+                                      @RequestParam(value="videoUrl",required = true)  String videoUrl,
+                                      @RequestParam(value="callbackUrl",required = true)  String callbackUrl
+                                      ) {
+        /**
+         * private String type;//数据id  1 院线通片花
+         private String fileId;//文件ID
+         private String videoName;//视频名称
+         private Long videoSize;//视频大小
+         private String videoMd5;//视频md5
+         private String videoUrl;//视频下载路径
+         private String callbackUrl;//处理结果回调  提供一个接收结果的接口
+         */
         TaskMessageResq taskMessageResq = new TaskMessageResq();
-        String type = task.getType();
-        String fileId = task.getFileId();
         taskMessageResq.setType(type);
         taskMessageResq.setFileId(fileId);
-
-        if(StringUtils.isBlank(type)||StringUtils.isBlank(fileId)||StringUtils.isBlank(task.getVideoMd5())||StringUtils.isBlank(task.getVideoName())
-                ||StringUtils.isBlank(task.getVideoUrl())||task.getVideoSize()==null||task.getVideoSize()==0L||StringUtils.isBlank(task.getCallbackUrl())){
-            taskMessageResq.setStatus("-10001");
-            taskMessageResq.setErrorMsg("任务的参数错误");
-            return taskMessageResq;
-        }
 
         Boolean isIn =  MemcacheCaller.INSTANCE.add(Constants.CREATE_TASK_KEY+"_"+type+"_"+fileId, 2, "2");
 
         try{
             if(isIn){
-                TaskMessage taskMessage = taskMessageService.getTaskMessageByFileId(type,fileId);
+                TaskMessage taskMessage = taskMessageService.getTaskMessageByFileId(Integer.valueOf(type),fileId);
                 if(taskMessage!=null){
                     taskMessageResq.setStatus("-10002");
                     taskMessageResq.setErrorMsg("创建任务的文件已存在,无法再创建新的任务了");
@@ -69,17 +69,17 @@ public class MediaTaskSyncController extends BaseController {
                 }
 
                 taskMessage = new TaskMessage();
+                taskMessage.setType(Integer.valueOf(type));
                 taskMessage.setTaskId(DateFormatUtils.format(new Date(),"yyyyMMddHH")+"_"+ UUID.randomUUID().toString());
-                taskMessage.setFileId(task.getFileId());
-                taskMessage.setCallbackUrl(task.getCallbackUrl());
+                taskMessage.setCallbackUrl(callbackUrl);
                 taskMessage.setStatus(Constants.TaskMessageStatus.NO_DULE);
                 taskMessage.setCreateTime(new Date());
                 taskMessage.setUpdateTime(new Date());
                 taskMessage.setFileId(fileId);
-                taskMessage.setVideoMd5(task.getVideoMd5());
-                taskMessage.setVideoName(task.getVideoName());
-                taskMessage.setVideoSize(task.getVideoSize());
-                taskMessage.setVideoUrl(task.getVideoUrl());
+                taskMessage.setVideoMd5(videoMd5);
+                taskMessage.setVideoName(videoName);
+                taskMessage.setVideoSize(Long.valueOf(videoSize));
+                taskMessage.setVideoUrl(videoUrl);
                 taskMessageService.addOrUpdate(taskMessage);
                 taskLogService.addLog(taskMessage.getTaskId(),1,"成功创建任务");
 
@@ -100,5 +100,12 @@ public class MediaTaskSyncController extends BaseController {
         }
         return taskMessageResq;
 	}
+
+    @RequestMapping(value = "/result",method = RequestMethod.POST)
+    @ResponseBody
+    public String result(String result) {
+        logger.info("result---->"+result);
+	    return "ok";
+    }
 
 }
