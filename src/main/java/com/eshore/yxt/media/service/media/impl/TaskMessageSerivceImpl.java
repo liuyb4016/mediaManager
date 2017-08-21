@@ -348,8 +348,8 @@ public class TaskMessageSerivceImpl implements TaskMessageService {
             MediaFile mediaFile2 = mediaFileService.getMediaFileBTaskId(taskMessage.getTaskId()+"_2");
             //类型  1 标清  2 高清
             List<TaskMessageResq> listNew = new ArrayList<TaskMessageResq>();
-            if(mediaFile1!=null) listNew.add(new TaskMessageResq(mediaFile1.getFileId(),mediaFile1.getDefType()+"",getMediaUrl(taskMessage,mediaFile1)));
-            if(mediaFile2!=null) listNew.add(new TaskMessageResq(mediaFile2.getFileId(),mediaFile2.getDefType()+"",getMediaUrl(taskMessage,mediaFile2)));
+            if(mediaFile1!=null) listNew.add(new TaskMessageResq(taskMessage.getTaskId(),mediaFile1.getFileId(),mediaFile1.getDefType()+"",getMediaUrl(taskMessage,mediaFile1)));
+            if(mediaFile2!=null) listNew.add(new TaskMessageResq(taskMessage.getTaskId(),mediaFile2.getFileId(),mediaFile2.getDefType()+"",getMediaUrl(taskMessage,mediaFile2)));
 
             JSONArray jsonArray=new JSONArray();//1、创建JSONArray
             jsonArray.addAll(listNew);
@@ -379,7 +379,7 @@ public class TaskMessageSerivceImpl implements TaskMessageService {
         return true;
     }
 
-    private String getMediaUrl(TaskMessage taskMessage,MediaFile mediaFile){
+    public String getMediaUrl(TaskMessage taskMessage,MediaFile mediaFile){
         String localPath = httpResUrl + "/task/" + taskMessage.getType()
                 + "/"+ DateFormatUtils.format(new Date(),"yyyyMMdd")+"/" +taskMessage.getTaskId();
         return localPath+"/"+mediaFile.getFileName();
@@ -447,5 +447,10 @@ public class TaskMessageSerivceImpl implements TaskMessageService {
                 proc.destroy();
         }
         return isSuccess;
+    }
+
+    @Override
+    public TaskMessage getTaskMessageByTaskId(String taskId){
+        return  taskMessageRepository.getTaskMessageByTaskId(taskId);
     }
 }

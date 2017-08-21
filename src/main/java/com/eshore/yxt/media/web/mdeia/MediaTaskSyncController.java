@@ -1,8 +1,12 @@
 package com.eshore.yxt.media.web.mdeia;
 
+import com.alibaba.fastjson.JSONArray;
 import com.eshore.yxt.media.core.constants.Constants;
+import com.eshore.yxt.media.core.util.HttpUtils;
 import com.eshore.yxt.media.core.util.cache.MemcacheCaller;
+import com.eshore.yxt.media.model.media.MediaFile;
 import com.eshore.yxt.media.model.media.TaskMessage;
+import com.eshore.yxt.media.service.media.MediaFileService;
 import com.eshore.yxt.media.service.media.TaskLogService;
 import com.eshore.yxt.media.service.media.TaskMessageService;
 import com.eshore.yxt.media.web.mdeia.req.TaskMessageReq;
@@ -20,8 +24,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.Date;
-import java.util.UUID;
+import java.io.File;
+import java.util.*;
 
 @Controller
 @RequestMapping(value="/mediaTask")
@@ -32,6 +36,8 @@ public class MediaTaskSyncController extends BaseController {
     private TaskMessageService taskMessageService;
     @Autowired
     private TaskLogService taskLogService;
+    @Autowired
+    private MediaFileService mediaFileService;
 
 	@RequestMapping(value = "/createtask",method = RequestMethod.POST)
 	@ResponseBody
@@ -55,14 +61,16 @@ public class MediaTaskSyncController extends BaseController {
         TaskMessageResq taskMessageResq = new TaskMessageResq();
         taskMessageResq.setType(type);
         taskMessageResq.setFileId(fileId);
-
+        taskMessageResq.setStatus("1");
+        taskMessageResq.setErrorMsg("任务创建成功，转码工作由定时任务完成。");
         Boolean isIn =  MemcacheCaller.INSTANCE.add(Constants.CREATE_TASK_KEY+"_"+type+"_"+fileId, 2, "2");
 
         try{
             if(isIn){
                 TaskMessage taskMessage = taskMessageService.getTaskMessageByFileId(Integer.valueOf(type),fileId);
                 if(taskMessage!=null){
-                    taskMessageResq.setStatus("-10002");
+                    taskMessageResq.setStatus("-10001");
+                    taskMessageResq.setTaskId(taskMessage.getTaskId());
                     taskMessageResq.setErrorMsg("创建任务的文件已存在,无法再创建新的任务了");
                     MemcacheCaller.INSTANCE.delete(Constants.CREATE_TASK_KEY+"_"+type+"_"+fileId);
                     return  taskMessageResq;
@@ -82,10 +90,10 @@ public class MediaTaskSyncController extends BaseController {
                 taskMessage.setVideoUrl(videoUrl);
                 taskMessageService.addOrUpdate(taskMessage);
                 taskLogService.addLog(taskMessage.getTaskId(),1,"成功创建任务");
-
+                taskMessageResq.setTaskId(taskMessage.getTaskId());
                 MemcacheCaller.INSTANCE.delete(Constants.CREATE_TASK_KEY+"_"+type+"_"+fileId);
             }else{
-                taskMessageResq.setStatus("-10003");
+                taskMessageResq.setStatus("-10002");
                 taskMessageResq.setErrorMsg("操作重复，已发送创建任务的操作");
                 MemcacheCaller.INSTANCE.delete(Constants.CREATE_TASK_KEY+"_"+type+"_"+fileId);
                 return  taskMessageResq;
@@ -93,13 +101,35 @@ public class MediaTaskSyncController extends BaseController {
         }catch(Exception e){
             e.printStackTrace();
             MemcacheCaller.INSTANCE.delete(Constants.CREATE_TASK_KEY+"_"+type+"_"+fileId);
-            taskMessageResq.setStatus("-10004");
+            taskMessageResq.setStatus("-10003");
             taskMessageResq.setErrorMsg("系统错误");
         }finally {
             MemcacheCaller.INSTANCE.delete(Constants.CREATE_TASK_KEY+"_"+type+"_"+fileId);
         }
         return taskMessageResq;
 	}
+
+    @RequestMapping(value = "/getTaskResult",method = RequestMethod.POST)
+    @ResponseBody
+    public List<TaskMessageResq> getTaskResult(String taskId) {
+	    if(StringUtils.isBlank(taskId)){
+            return new ArrayList<TaskMessageResq>();
+        }
+
+        TaskMessage taskMessage = taskMessageService.getTaskMessageByTaskId(taskId);
+        if(taskMessage==null||taskMessage.getStatus().intValue()!= Constants.TaskMessageStatus.DULED.intValue()){
+            return new ArrayList<TaskMessageResq>();
+        }
+
+        ///转码完成。新增视频文件数据
+        MediaFile mediaFile1 = mediaFileService.getMediaFileBTaskId(taskMessage.getTaskId()+"_1");
+        MediaFile mediaFile2 = mediaFileService.getMediaFileBTaskId(taskMessage.getTaskId()+"_2");
+        //类型  1 标清  2 高清
+        List<TaskMessageResq> listNew = new ArrayList<TaskMessageResq>();
+        if(mediaFile1!=null) listNew.add(new TaskMessageResq(taskMessage.getTaskId(),mediaFile1.getFileId(),mediaFile1.getDefType()+"",taskMessageService.getMediaUrl(taskMessage,mediaFile1)));
+        if(mediaFile2!=null) listNew.add(new TaskMessageResq(taskMessage.getTaskId(),mediaFile2.getFileId(),mediaFile2.getDefType()+"",taskMessageService.getMediaUrl(taskMessage,mediaFile2)));
+        return listNew;
+    }
 
     @RequestMapping(value = "/result",method = RequestMethod.POST)
     @ResponseBody

@@ -22,5 +22,8 @@ public interface TaskMessageRepository extends CrudRepository<TaskMessage, Long>
     @Query("SELECT taskMessage.id from TaskMessage taskMessage where taskMessage.status=?1 ")
     public List<Long> findIdListTaskMessageByStatus(Integer status);
 
+    @Query("select taskMessage from TaskMessage taskMessage where taskMessage.taskId = ?1 ")
+    public TaskMessage getTaskMessageByTaskId(String taskId);
+
 }
 

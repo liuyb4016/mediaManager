@@ -43,7 +43,6 @@ public class CallBackUrlJob_4 {
         List<Long> taskIdList = taskMessageService.findIdListTaskMessageByStatus(Constants.TaskMessageStatus.FFMPEG720ED);
         for(Long taskId:taskIdList){
             taskMessageService.callBackUrl(taskId);
-
         }
         int countV =count.decrementAndGet();// 自减1,返回更新值
         logger.info("回调第三方  定时任务运行结束。当前服务的定时转码任务数递减到："+countV+"个。");

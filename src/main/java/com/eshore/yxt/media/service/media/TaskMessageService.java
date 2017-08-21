@@ -42,4 +42,6 @@ public interface TaskMessageService {
     public Boolean callBackUrl(Long taskId);
 
     public Boolean ffmpegVideo(String sourceFile,String targetFile,String fileName,String type);
+    public String getMediaUrl(TaskMessage taskMessage,MediaFile mediaFile);
+    public TaskMessage getTaskMessageByTaskId(String taskId);
 }
